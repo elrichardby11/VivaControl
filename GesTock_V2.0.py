@@ -15,7 +15,6 @@ class MiniMarketApp:
         }
 
         self.current_cart = {}  # Código de producto: cantidad
-
         self.create_widgets()
 
     def create_widgets(self):
@@ -31,11 +30,10 @@ class MiniMarketApp:
         self.add_to_cart_button = tk.Button(self.root, text="Agregar al carrito", command=self.add_to_cart)
         self.add_to_cart_button.pack()
 
-        self.cart_label = tk.Label(self.root, text="Carrito:")
+        self.cart_label = tk.Label(self.root, text="Carrito: ")
         self.cart_label.pack()
 
         self.cart_listbox = tk.Listbox(self.root)
-        
         self.cart_listbox.pack()
 
         self.edit_button = tk.Button(self.root, text="Editar", command=self.edit_quantity)
@@ -49,7 +47,7 @@ class MiniMarketApp:
 
     def update_time(self):
         current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-        self.time_label.config(text=f"Hora actual: {current_time}")
+        self.time_label.config(text=f"Fecha actual: {current_time}")
         self.root.after(1000, self.update_time)
 
     def add_to_cart(self):
@@ -100,17 +98,56 @@ class MiniMarketApp:
 
     def save_to_file(self, total_amount, payment_method):
         now = datetime.now()
+        #Nombre del Archivo
         filename = now.strftime("%Y-%m-%d_%H-%M-%S.txt")
+        formatted_date = now.strftime("Fecha: %Y-%m-%d")
+        formatted_time = now.strftime("Hora: %H:%M:%S")
+
+        neto = round(total_amount / 1.19)
+        iva = round(total_amount - neto)
+
         with open(filename, "w") as file:
-            file.write(f"Fecha y Hora: {now}\n")
-            file.write("Productos comprados:\n")
+            file.write(" _____________________________________________________ \n")
+            file.write("|                                                     |\n")
+            file.write("|RUT: 11.111.111-1                                    |\n")
+            file.write("|RAZON SOCIAL: FANTASIA S.A                           |\n")
+            file.write("|BLABLA NRO 999 - PISO 2234B                          |\n")
+            file.write("|LAS CONDES - SANTIAGO F. -256784321                  |\n")
+            file.write("|GIRO: VENTAS AL POR MENOS DE MERCADERIA              |\n")
+            file.write("|_____________________________________________________|\n")
+            file.write(f"Fecha: {formatted_date}          Hora: {formatted_time}\n")
+            file.write(" Boleta Electronica:        123.456.789\n")
+            file.write(" CAJA: 2 CAJERO: RICHARD MAZUELOS\n")
+            file.write(" D E T A L L E\n")
+            file.write(" ---------------\n")
+            
             for code, quantity in self.current_cart.items():
+                product_code = code
                 product_name = self.products[code]["name"]
-                file.write(f"{product_name} - Cantidad: {quantity}\n")
-            file.write(f"Total: ${total_amount}\n")
-            file.write(f"Método de pago: {payment_method}\n")
-        
+                price = self.products[code]["price"]
+                total_price = quantity * price
+                formatted_quantity = format_number(quantity)
+                formatted_price = format_number(price)
+                formatted_total_price = format_number(total_price)
+                if quantity > 1:
+                    file.write(f"Codigo: {product_code}\n")
+                    file.write(f"{formatted_quantity:>3}X{formatted_price} {product_name:<33}$ {formatted_total_price:>10}\n")
+                else:
+                    file.write(f"{product_code} {product_name:<29}$ {formatted_total_price:>10}\n")
+            file.write(" -----------------------------------------------------\n")
+            file.write(f"                             Neto:         $ {format_number(neto):>10}\n")
+            file.write(f"                             IVA 19%:      $ {format_number(iva):>10}\n")
+            file.write(f"                             TOTAL:        $ {format_number(total_amount):>10}\n")
+            file.write(" ---------------------P A G O S-----------------------\n")
+            file.write(f" {payment_method}           $ {format_number(total_amount):>10}\n")
+            file.write(" Vuelto             $     0\n")
+            file.write(" =====================================================\n")
+
         print(f"Registro guardado en {filename}")
+
+def format_number(number):
+    return "{:,.0f}".format(number).replace(",", ".")
+
 
 def main():
     root = tk.Tk()
