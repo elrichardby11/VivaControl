@@ -1,4 +1,6 @@
 import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
 from tkinter import simpledialog
 from datetime import datetime
 
@@ -6,11 +8,11 @@ class MiniMarketApp:
     def __init__(self, root):
         self.root = root
         self.root.title("MiniMarket - Punto de Venta")
-        self.root.geometry("650x450")
+        self.root.geometry("650x520")
 
         self.products = {
             "7807265064173": {"name": "Producto 1", "price": 1000},
-            "67890": {"name": "Producto 2", "price": 1500}
+            "7501007528427": {"name": "Producto 2", "price": 1500}
             # Agrega más productos con su información
         }
 
@@ -34,15 +36,16 @@ class MiniMarketApp:
         #Evento Pulsar Enter
         self.scan_entry.bind('<Return>', self.add_to_cart)
 
-        self.message_label = tk.Label(self.root, text="Escanee un producto ", fg="green")
+        self.message_label = tk.Label(self.root, text="Escanee un producto ", fg="black")
         self.message_label.pack()
 
         self.cart_label = tk.Label(self.root, text="Carrito: ")
         self.cart_label.pack()
 
-        self.cart_listbox = tk.Listbox(self.root)
-        self.cart_listbox.configure(width=60)
+        self.cart_listbox = tk.Listbox(self.root,borderwidth=3, relief="ridge",width=60)
         self.cart_listbox.pack()
+        self.subtotal_label = tk.Label(self.root, text="Subtotal:    $    0")
+        self.subtotal_label.pack()
 
         self.edit_button = tk.Button(self.root, text="Editar", command=self.edit_quantity)
         self.edit_button.pack()
@@ -53,10 +56,28 @@ class MiniMarketApp:
         self.payment_button = tk.Button(self.root, text="Pagar", command=self.payment)
         self.payment_button.pack()
 
+        self.payment_label = tk.Label(self.root, text="Selecciona el método de pago:")
+        self.payment_label.pack()
+
+        self.payment_options = ttk.Combobox(self.root, values=['Efectivo', 'Débito', 'Crédito'], state="readonly")
+        self.payment_options.bind("<<ComboboxSelected>>", self.handle_payment_selection)
+        self.payment_options.pack()
+
+        self.message_label2 = tk.Label(self.root, text="Monto en Efectivo: ", fg="black")
+        self.message_label2.pack()
+
+        self.scan_entry2 = tk.Entry(self.root, state="disabled")
+        self.scan_entry2.pack()
+
     def update_time(self):
         current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         self.time_label.config(text=f"Fecha actual: {current_time}")
         self.root.after(1000, self.update_time)
+
+    def update_subtotal(self):
+
+        total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
+        self.subtotal_label.config(text=f"Subtotal:    $    {total_amount:>80}")
 
     def add_to_cart(self, event=None):
         product_code = self.scan_entry.get()
@@ -67,6 +88,7 @@ class MiniMarketApp:
                 self.current_cart[product_code] = 1
 
             self.message_label.config(text=f"Elemento escaneado: {product_code}", fg="green")
+            self.update_subtotal()
             self.update_cart_listbox()
         else:
             self.message_label.config(text=f"Producto no encontrado {product_code}",fg="red")
@@ -78,16 +100,17 @@ class MiniMarketApp:
         for code, quantity in self.current_cart.items():
             product_name = self.products[code]["name"]
             price = self.products[code]["price"]
-            self.cart_listbox.insert(tk.END, f"{code} - {product_name} - Cant: {quantity} - Precio: {price}")
+            self.cart_listbox.insert(tk.END, f"{code} - {product_name:<40} Cant: {quantity} - Precio: {price:<10}")
 
     def edit_quantity(self):
         selected_index = self.cart_listbox.curselection()
         if selected_index:
             selected_product = list(self.current_cart.keys())[selected_index[0]]
-            new_quantity = tk.simpledialog.askinteger("Editar cantidad", f"Editar cantidad de {self.products[selected_product]['name']}:")
+            new_quantity = tk.simpledialog.askinteger("Editar cantidad", "Editar cantidad de "f"{self.products[selected_product]['name']:}")
             if new_quantity is not None:
                 self.current_cart[selected_product] = new_quantity
                 self.message_label.config(text=f"Elemento editado: {selected_product}", fg="green")
+                self.update_subtotal()
                 self.update_cart_listbox()
             else:
                 pass
@@ -98,13 +121,49 @@ class MiniMarketApp:
             selected_product = list(self.current_cart.keys())[selected_index[0]]
             del self.current_cart[selected_product]
             self.message_label.config(text=f"Elemento eliminado: {selected_product}", fg="green")
+            self.update_subtotal()
             self.update_cart_listbox()
+
+
+    def handle_payment_selection(self, event):
+        selected_payment_method = self.payment_options.get()
+        if selected_payment_method == "Efectivo":
+            self.scan_entry2.config(state="normal")
+        else:
+            # Borra el contenido del campo Entry
+            self.scan_entry2.delete(0, tk.END)
+            self.scan_entry2.config(state="disabled")
 
     def payment(self):
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
-        payment_method = tk.simpledialog.askstring("Método de pago", f"Total a pagar: ${total_amount}\nIngrese el método de pago:")
-        if payment_method:
-            self.save_to_file(total_amount, payment_method)
+        if (total_amount == 0):
+            self.message_label.config(text="Por favor, selecciona un producto.", fg="red")
+            return
+        else:
+            payment_method = self.payment_options.get()
+            if not payment_method:
+                self.message_label.config(text="Por favor, selecciona un método de pago.", fg="red")
+                return
+            
+            selected_payment_method = self.payment_options.get()
+            payment_quantity = self.scan_entry2.get()
+            if (selected_payment_method == "Efectivo") and (not payment_quantity):
+                self.message_label.config(text="Por favor, confirma el monto en efectivo.", fg="red")
+            else:
+                payment_confirmation = f"Total a pagar: ${total_amount}\nMétodo de pago: {payment_method}"
+                if tk.messagebox.askyesno("Confirmar Pago", payment_confirmation):
+                    self.save_to_file(total_amount, payment_method)
+                    self.clear_cart()
+                else:
+                    self.message_label.config(text="Pago no confirmado", fg="red")
+
+    def clear_cart(self):
+        self.current_cart = {}
+        self.cart_listbox.delete(0, tk.END)
+        self.message_label.config(text="Carrito vacío", fg="black")
+
+
+
 
     def save_to_file(self, total_amount, payment_method):
         now = datetime.now()
@@ -157,7 +216,6 @@ class MiniMarketApp:
 
 def format_number(number):
     return "{:,.0f}".format(number).replace(",", ".")
-
 
 def main():
     root = tk.Tk()
