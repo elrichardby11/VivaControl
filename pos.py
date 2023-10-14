@@ -2,13 +2,13 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import simpledialog
-from datetime import datetime
+from datetime import datetime   
 
-class MiniMarketApp:
+class PoS:
     def __init__(self, root):
         self.root = root
         self.root.title("MiniMarket - Punto de Venta")
-        self.root.geometry("650x520")
+        self.root.geometry("650x540")
 
         self.products = {
             "7807265064173": {"name": "Producto 1", "price": 1000},
@@ -16,7 +16,7 @@ class MiniMarketApp:
             # Agrega más productos con su información
         }
 
-        self.current_cart = {}  # Código de producto: cantidad
+        self.current_cart = {}
         self.create_widgets()
 
     def create_widgets(self):
@@ -77,7 +77,7 @@ class MiniMarketApp:
     def update_subtotal(self):
 
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
-        self.subtotal_label.config(text=f"Subtotal:    $    {total_amount:>80}")
+        self.subtotal_label.config(text=f"Subtotal:    $    {total_amount:>90}")
 
     def add_to_cart(self, event=None):
         product_code = self.scan_entry.get()
@@ -146,33 +146,48 @@ class MiniMarketApp:
                 return
             
             selected_payment_method = self.payment_options.get()
-            payment_quantity = self.scan_entry2.get()
-            if (selected_payment_method == "Efectivo") and (not payment_quantity):
-                self.message_label.config(text="Por favor, confirma el monto en efectivo.", fg="red")
+            if (selected_payment_method == "Efectivo") and (self.scan_entry2.get() != ""):
+                payment_quantity = int(self.scan_entry2.get())
+                if (not payment_quantity) or (payment_quantity<total_amount):
+                    self.message_label.config(text="Por favor, verifica el monto en efectivo.", fg="red")
+                else:
+                    payment_confirmation = f"Total a pagar: ${total_amount}\nMétodo de pago: {payment_method}\nVuelto: ${payment_quantity-total_amount}"
+                    if tk.messagebox.askyesno("Confirmar Pago", payment_confirmation):
+                        self.save_to_file(total_amount, payment_method, payment_quantity)
+                        self.clear_cart()
+                    else:
+                        self.message_label.config(text="Pago no confirmado", fg="red")
+            elif selected_payment_method == "Efectivo":
+                self.message_label.config(text="Por favor, verifica el monto en efectivo.", fg="red")
+
             else:
+                payment_quantity=total_amount
                 payment_confirmation = f"Total a pagar: ${total_amount}\nMétodo de pago: {payment_method}"
                 if tk.messagebox.askyesno("Confirmar Pago", payment_confirmation):
-                    self.save_to_file(total_amount, payment_method)
+                    self.save_to_file(total_amount, payment_method, payment_quantity)
                     self.clear_cart()
                 else:
                     self.message_label.config(text="Pago no confirmado", fg="red")
 
     def clear_cart(self):
+        self.scan_entry.delete(0, tk.END)
         self.current_cart = {}
         self.cart_listbox.delete(0, tk.END)
+        self.update_subtotal()
+        self.payment_options.set("")
+        self.scan_entry2.delete(0, tk.END)
+        self.scan_entry2.config(state="disabled")
+        self.scan_entry.focus_set()
         self.message_label.config(text="Carrito vacío", fg="black")
 
-
-
-
-    def save_to_file(self, total_amount, payment_method):
+    def save_to_file(self, total_amount, payment_method, payment_quantity):
         now = datetime.now()
         #Nombre del Archivo
         filename = now.strftime("%Y-%m-%d_%H-%M-%S.txt")
         formatted_date = now.strftime("Fecha: %d-%m-%Y")
         formatted_time = now.strftime("Hora: %H:%M:%S")
 
-        neto = round(total_amount / 1.19)
+        neto = round    (total_amount / 1.19)
         iva = round(total_amount - neto)
 
         with open(filename, "w") as file:
@@ -208,18 +223,24 @@ class MiniMarketApp:
             file.write(f"                             IVA 19%:      $ {format_number(iva):>10}\n")
             file.write(f"                             TOTAL:        $ {format_number(total_amount):>10}\n")
             file.write(" ---------------------P A G O S-----------------------\n")
-            file.write(f" {payment_method}           $ {format_number(total_amount):>10}\n")
-            file.write(" Vuelto             $     0\n")
-            file.write(" =====================================================\n")
+            if payment_method == "Efectivo":
+                file.write(f" {payment_method}           $ {format_number(payment_quantity):>10}\n")
+                file.write(f" Vuelto             $ { format_number(payment_quantity-total_amount):>10}\n")
+                file.write(" =====================================================\n")
+            else:
+                file.write(f" {payment_method:<7}           $ {format_number(total_amount):>10}\n")
+                file.write(" Vuelto            $          0\n")
+                file.write(" =====================================================\n")
 
         print(f"Registro guardado en {filename}")
+
 
 def format_number(number):
     return "{:,.0f}".format(number).replace(",", ".")
 
 def main():
     root = tk.Tk()
-    app = MiniMarketApp(root)
+    app = PoS(root)
     app.update_time()  # Iniciar la actualización del tiempo
     root.mainloop()
 
