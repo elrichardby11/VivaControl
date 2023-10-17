@@ -114,6 +114,9 @@ class PoS:
                 self.update_cart_listbox()
             else:
                 pass
+        else:
+            self.message_label.config(text="Por favor, selecciona un producto.", fg="red")
+
 
     def remove_product(self):
         selected_index = self.cart_listbox.curselection()
@@ -123,6 +126,8 @@ class PoS:
             self.message_label.config(text=f"Elemento eliminado: {selected_product}", fg="green")
             self.update_subtotal()
             self.update_cart_listbox()
+        else:
+            self.message_label.config(text="Por favor, selecciona un producto.", fg="red")
 
 
     def handle_payment_selection(self, event):
@@ -137,7 +142,7 @@ class PoS:
     def payment(self):
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
         if (total_amount == 0):
-            self.message_label.config(text="Por favor, selecciona un producto.", fg="red")
+            self.message_label.config(text="Por favor, agrega un producto.", fg="red")
             return
         else:
             payment_method = self.payment_options.get()
@@ -146,7 +151,7 @@ class PoS:
                 return
             
             selected_payment_method = self.payment_options.get()
-            if (selected_payment_method == "Efectivo") and (self.scan_entry2.get() != ""):
+            if (selected_payment_method == "Efectivo") and (self.scan_entry2.get() != "") and (self.scan_entry2.get().isdigit()):
                 payment_quantity = int(self.scan_entry2.get())
                 if (not payment_quantity) or (payment_quantity<total_amount):
                     self.message_label.config(text="Por favor, verifica el monto en efectivo.", fg="red")
