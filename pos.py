@@ -8,7 +8,7 @@ class PoS:
     def __init__(self, root):
         self.root = root
         self.root.title("MiniMarket - Punto de Venta")
-        self.root.geometry("650x540")
+        self.root.geometry("710x380")
 
         self.products = {
             "7807265064173": {"name": "Producto 1", "price": 1000},
@@ -20,54 +20,65 @@ class PoS:
         self.create_widgets()
 
     def create_widgets(self):
-        self.time_label = tk.Label(self.root, text="")
+
+        #Izquierda
+        left_frame = tk.Frame(self.root)
+        left_frame.pack(side="left")
+
+        self.time_label = tk.Label(left_frame, text="")
         self.time_label.pack()
 
-        self.scan_label = tk.Label(self.root, text="Escanea el código del producto:")
+        self.scan_label = tk.Label(left_frame, text="Escanea el código del producto:")
         self.scan_label.pack()
 
-        self.scan_entry = tk.Entry(self.root)
+        self.scan_entry = tk.Entry(left_frame)
         self.scan_entry.pack()
         self.scan_entry.focus_set()
 
-        self.add_to_cart_button = tk.Button(self.root, text="Agregar al carrito", command=self.add_to_cart)
+        self.add_to_cart_button = tk.Button(left_frame, text="Agregar al carrito", command=self.add_to_cart)
         self.add_to_cart_button.pack()
 
         #Evento Pulsar Enter
         self.scan_entry.bind('<Return>', self.add_to_cart)
 
-        self.message_label = tk.Label(self.root, text="Escanee un producto ", fg="black")
+        self.message_label = tk.Label(left_frame, text="Escanee un producto ", fg="black")
         self.message_label.pack()
 
-        self.cart_label = tk.Label(self.root, text="Carrito: ")
+        self.cart_label = tk.Label(left_frame, text="Carrito: ")
         self.cart_label.pack()
 
-        self.cart_listbox = tk.Listbox(self.root,borderwidth=3, relief="ridge",width=60)
+        self.cart_listbox = tk.Listbox(left_frame,borderwidth=3, relief="ridge",width=60)
         self.cart_listbox.pack()
-        self.subtotal_label = tk.Label(self.root, text="Subtotal:    $    0")
+        self.subtotal_label = tk.Label(left_frame, text="Total:    $    0")
         self.subtotal_label.pack()
 
-        self.edit_button = tk.Button(self.root, text="Editar", command=self.edit_quantity)
-        self.edit_button.pack()
+        #Derecha
+        right_frame = tk.Frame(self.root)
+        right_frame.pack(side="right")
 
-        self.remove_button = tk.Button(self.root, text="Eliminar", command=self.remove_product)
-        self.remove_button.pack()
-
-        self.payment_button = tk.Button(self.root, text="Pagar", command=self.payment)
-        self.payment_button.pack()
-
-        self.payment_label = tk.Label(self.root, text="Selecciona el método de pago:")
+        self.payment_label = tk.Label(right_frame, text="Selecciona el método de pago:")
         self.payment_label.pack()
 
-        self.payment_options = ttk.Combobox(self.root, values=['Efectivo', 'Débito', 'Crédito'], state="readonly")
+        self.payment_options = ttk.Combobox(right_frame, values=['Efectivo', 'Débito', 'Crédito'], state="readonly")
         self.payment_options.bind("<<ComboboxSelected>>", self.handle_payment_selection)
         self.payment_options.pack()
 
-        self.message_label2 = tk.Label(self.root, text="Monto en Efectivo: ", fg="black")
+        self.message_label2 = tk.Label(right_frame, text="Monto en Efectivo: ", fg="black")
         self.message_label2.pack()
 
-        self.scan_entry2 = tk.Entry(self.root, state="disabled")
+        self.scan_entry2 = tk.Entry(right_frame, state="disabled")
         self.scan_entry2.pack()
+
+        self.scan_entry2.bind('<Return>', self.payment)
+
+        self.edit_button = tk.Button(right_frame, text="Editar", command=self.edit_quantity)
+        self.edit_button.pack()
+
+        self.remove_button = tk.Button(right_frame, text="Eliminar", command=self.remove_product)
+        self.remove_button.pack()
+
+        self.payment_button = tk.Button(right_frame, text="Pagar", command=self.payment)
+        self.payment_button.pack()
 
     def update_time(self):
         current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
@@ -77,7 +88,7 @@ class PoS:
     def update_subtotal(self):
 
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
-        self.subtotal_label.config(text=f"Subtotal:    $    {total_amount:>90}")
+        self.subtotal_label.config(text=f"Total:    $    {total_amount:>90}")
 
     def add_to_cart(self, event=None):
         product_code = self.scan_entry.get()
@@ -139,7 +150,7 @@ class PoS:
             self.scan_entry2.delete(0, tk.END)
             self.scan_entry2.config(state="disabled")
 
-    def payment(self):
+    def payment(self, event=None):
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
         if (total_amount == 0):
             self.message_label.config(text="Por favor, agrega un producto.", fg="red")
