@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from pos import PoS
+from pos.pos import PoS
 
 class LoginApp:
     def __init__(self, root):
