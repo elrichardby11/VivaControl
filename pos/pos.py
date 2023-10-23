@@ -3,17 +3,17 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import simpledialog
 from datetime import datetime 
-from pos.file_operations import save_to_file
-from pos.products import products
+from file_operations import save_to_file
+from products import products
 
 class PoS:
     def __init__(self, root):
         self.root = root
-        self.root.title("MiniMarket - Punto de Venta")
+        self.root.title("VivaControl - Punto de Venta")
+        #img = tk.PhotoImage(file='/home/richard/OneDrive/VivaControl/01.CODE/pos/src/VivaControl.png')
+        #self.root.iconphoto(False,img)
         self.root.geometry("710x380")
-
         self.products = products
-
         self.current_cart = {}
         self.create_widgets()
 

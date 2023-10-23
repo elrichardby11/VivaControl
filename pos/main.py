@@ -1,5 +1,5 @@
 import tkinter as tk
-from pos.pos import PoS
+from pos import PoS
 
 def main():
     root = tk.Tk()
