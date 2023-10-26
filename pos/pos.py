@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from datetime import datetime 
@@ -45,8 +46,23 @@ class PoS:
         self.cart_label = tk.Label(left_frame, text="Carrito: ")
         self.cart_label.pack()
 
-        self.cart_listbox = tk.Listbox(left_frame,borderwidth=3, relief="ridge",width=60)
+        #Tabla para mostrar datos en forma de grilla
+        #Considerar que grid, también se puede traducir como grilla
+        self.tree = ttk.Treeview(left_frame, height=0, columns=("col2","col3", "col4"))
+        #self.tree.grid(row=4, column=0, columnspan=2)
+        self.tree.heading("#0", text="Código", anchor=CENTER)
+        self.tree.heading("col2", text="Nombre", anchor=CENTER)
+        self.tree.heading("col3", text="Cantidad", anchor=CENTER)
+        self.tree.heading("col4", text="Precio", anchor=CENTER)
+        self.tree.column("#0", width=262)
+        self.tree.column("col2", width=262)
+        self.tree.column("col3", width=262)
+        self.tree.column("col4", width=262)
+        self.tree.pack()
+
+        self.cart_listbox = tk.Listbox(left_frame,borderwidth=2, relief="ridge",width=130)
         self.cart_listbox.pack()
+
         self.subtotal_label = tk.Label(left_frame, text="Total:    $    0")
         self.subtotal_label.pack()
 
@@ -86,7 +102,9 @@ class PoS:
     def update_subtotal(self):
 
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
-        self.subtotal_label.config(text=f"Total:    $    {total_amount:>90}")
+        self.subtotal_label.config(text=f"Total:{' ' * 186}$ {total_amount}")
+        
+
 
     def add_to_cart(self, event=None):
         product_code = self.scan_entry.get()
@@ -109,7 +127,7 @@ class PoS:
         for code, quantity in self.current_cart.items():
             product_name = self.products[code]["name"]
             price = self.products[code]["price"]
-            self.cart_listbox.insert(tk.END, f"{code} - {product_name:<40} Cant: {quantity} - Precio: {price:<10}")
+            self.cart_listbox.insert(tk.END, f"{code:^50}{product_name:^60}{quantity:^63}{price:^65}")
 
     def edit_quantity(self):
         selected_index = self.cart_listbox.curselection()
@@ -126,7 +144,6 @@ class PoS:
         else:
             self.message_label.config(text="Por favor, selecciona un producto.", fg="red")
 
-
     def remove_product(self):
         selected_index = self.cart_listbox.curselection()
         if selected_index:
@@ -137,7 +154,6 @@ class PoS:
             self.update_cart_listbox()
         else:
             self.message_label.config(text="Por favor, selecciona un producto.", fg="red")
-
 
     def handle_payment_selection(self, event):
         selected_payment_method = self.payment_options.get()
@@ -193,7 +209,6 @@ class PoS:
         self.scan_entry2.config(state="disabled")
         self.scan_entry.focus_set()
         self.message_label.config(text="Carrito vacío", fg="black")
-
 
 def main():
     root = tk.Tk()
