@@ -104,8 +104,6 @@ class PoS:
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
         self.subtotal_label.config(text=f"Total:{' ' * 186}$ {total_amount}")
         
-
-
     def add_to_cart(self, event=None):
         product_code = self.scan_entry.get()
         if product_code in self.products:

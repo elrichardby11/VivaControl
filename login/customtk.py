@@ -1,6 +1,7 @@
 import tkinter
 import customtkinter
 from PIL import ImageTk, Image
+import subprocess
 
 class Login:
 
@@ -24,30 +25,53 @@ class Login:
         self.l2 = customtkinter.CTkLabel(master=self.frame, text="Inicio Sesión", font=('Century Gothic', 20))
         self.l2.place(x=105, y=45)
 
-        self.entry1 = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Nombre de Usuario')
-        self.entry1.place(x=50, y=110)
+        self.nombre_de_usuario = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Nombre de Usuario')
+        self.nombre_de_usuario.place(x=50, y=110)
 
-        self.entry2 = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Contraseña', show="*")
-        self.entry2.place(x=50, y=165)
+        self.contrasena = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Contraseña', show="*")
+        self.contrasena.place(x=50, y=165)
 
         # Evento Pulsar Enter
-        self.entry2.bind('<Return>', self.button_function)
+        self.contrasena.bind('<Return>', self.registrar_usuario)
 
         self.l3 = customtkinter.CTkLabel(master=self.frame, text="Contraseña Olvidada?", font=('Century Gothic', 12))
         self.l3.place(x=155, y=195)
 
         # Create custom button
-        self.button1 = customtkinter.CTkButton(master=self.frame, width=220, text="Iniciar Sesión", command=self.button_function, corner_radius=6)
+        self.button1 = customtkinter.CTkButton(master=self.frame, width=220, text="Iniciar Sesión", command= self.verificar_credenciales, corner_radius=6)
         self.button1.place(x=50, y=240)
 
     def button_function(self, event=None):
-        self.root.destroy()  # destroy current window and creating new one
-        self.w = customtkinter.CTk()
-        self.w.geometry("1280x720")
-        self.w.title('Welcome')
-        self.l1 = customtkinter.CTkLabel(master=self.w, text="Home Page", font=('Century Gothic', 60))
-        self.l1.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
-        self.w.mainloop()
+
+        self.root.destroy()  # destroy current window
+        main_pos = '../01.CODE/pos/main.py'
+        try:
+            subprocess.run(["python3", main_pos], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar {main_pos}: {e}")
+
+        #self.w = customtkinter.CTk()
+        #self.w.geometry("1280x720")
+        #self.w.title('Welcome')
+        #self.l1 = customtkinter.CTkLabel(master=self.w, text="Home Page", font=('Century Gothic', 60))
+        #self.l1.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+        #self.w.mainloop()
+
+    def registrar_usuario(self, event=None):
+        self.nombre = self.nombre_de_usuario.get()
+        self.password = self.contrasena.get()
+        with open('../01.CODE/usuarios.txt', 'a') as archivo:
+            archivo.write(f"{self.nombre},{self.password}\n")
+
+    def verificar_credenciales(self):
+        nombre_de_usuario = self.nombre_de_usuario.get()
+        contrasena_ingresada = self.contrasena.get()
+        with open('../01.CODE/usuarios.txt', 'r') as archivo:
+            for linea in archivo:
+                usuario, contrasena = linea.strip().split(',')
+                if usuario == nombre_de_usuario and contrasena == contrasena_ingresada:
+                    self.button_function(self)
+                    
 
 def main():
     # You can easily integrate authentication system
