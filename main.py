@@ -14,7 +14,7 @@ class Login:
         self.widgets()
 
     def widgets(self):
-        self.img1 = ImageTk.PhotoImage(Image.open("./login/assets/pattern.png"))
+        self.img1 = ImageTk.PhotoImage(Image.open("./assets/pattern.png"))
         self.l1 = customtkinter.CTkLabel(master=self.root, image=self.img1)
         self.l1.pack()
 
@@ -71,7 +71,6 @@ class Login:
                 usuario, contrasena = linea.strip().split(',')
                 if usuario == nombre_de_usuario and contrasena == contrasena_ingresada:
                     self.button_function(self)
-                    
 
 def main():
     # You can easily integrate authentication system

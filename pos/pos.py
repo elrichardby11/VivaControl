@@ -11,8 +11,8 @@ class PoS:
     def __init__(self, root):
         self.root = root
         self.root.title("VivaControl - Punto de Venta")
-        #img = tk.PhotoImage(file='/home/richard/OneDrive/VivaControl/01.CODE/pos/src/VivaControl.png')
-        #self.root.iconphoto(False,img)
+        img = tk.PhotoImage(file='./assets/VivaControl.png')
+        self.root.iconphoto(False,img)
         self.root.geometry("710x380")
         self.products = products
         self.current_cart = {}
