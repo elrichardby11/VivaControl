@@ -44,7 +44,7 @@ class Login:
     def button_function(self, event=None):
 
         self.root.destroy()  # destroy current window
-        main_pos = '../01.CODE/pos/main.py'
+        main_pos = '../01.CODE/menu/main.py'
         try:
             subprocess.run(["python3", main_pos], check=True)
         except subprocess.CalledProcessError as e:

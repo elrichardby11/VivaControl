@@ -7,7 +7,7 @@ from datetime import datetime
 from file_operations import save_to_file
 from products import products
 
-class PoS:
+class PoS():
     def __init__(self, root):
         self.root = root
         self.root.title("VivaControl - Punto de Venta")

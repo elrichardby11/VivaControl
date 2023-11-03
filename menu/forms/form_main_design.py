@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import font
+import subprocess
 from config import color_barra_superior, color_cuerpo_principal, color_menu_cursor_encima, color_menu_lateral
 import useful.useful_assets as util_img
 import useful.useful_window as util_ventana
@@ -8,12 +9,14 @@ class FormMainDesign(tk.Tk):
 
     def __init__(self):
         super().__init__()
+        #self.pos_app = PoS(self)
         self.logo = util_img.leer_imagen("/home/richard/Documentos/VivaControl/01.CODE/assets/VivaControl.png", (560, 136))
         self.perfil = util_img.leer_imagen("/home/richard/Documentos/VivaControl/01.CODE/assets/Profile.png", (100,100))
         self.config_window()
         self.panels()
         self.top_bar_controls()
         self.lateral_menu_controls()
+        #self.show_pos()
 
     def config_window(self):
         #Configuracion de la ventana inicial
@@ -66,7 +69,7 @@ class FormMainDesign(tk.Tk):
         self.perfilLabel = tk.Label(self.menu_lateral, image=self.perfil, bg=color_menu_lateral)
         self.perfilLabel.pack(side=tk.TOP, pady=10, padx=2)
 
-        self.buttonPoS = tk.Button(self.menu_lateral)
+        self.buttonPoS = tk.Button(self.menu_lateral, command=self.show_pos)
         self.buttonProfile = tk.Button(self.menu_lateral)
         self.buttonSettings = tk.Button(self.menu_lateral)
         
@@ -78,6 +81,16 @@ class FormMainDesign(tk.Tk):
 
         for text, icon, button in buttons_info:
             self.config_button_menu(button, text, icon, font_awesome, width, height)
+
+    def show_pos(self, event=None):
+        self.destroy()
+        #self.withdraw()  # Oculta la ventana del menú
+        main_pos = '../01.CODE/menu/pos/main.py'
+        try:
+            subprocess.run(["python3", main_pos], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar {main_pos}: {e}")
+
 
     def config_button_menu(self, button, text, icon, font_awesome, width, height):
         button.config(text=f"   {icon}      {text}", anchor="w", font=font_awesome, bd=0,
@@ -104,10 +117,4 @@ class FormMainDesign(tk.Tk):
             self.menu_lateral.pack_forget()
         else:
             self.menu_lateral.pack(side=tk.LEFT, fill="y")
-
-
-
-
-
-
 

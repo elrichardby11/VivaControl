@@ -10,7 +10,7 @@ def main():
         conexion=cx_Oracle.connect(
         user="Juan_Rodriguez",
         password="Mn3rP7oBsKxL#",
-        dsn="0.0.0.0:9501/XE")
+        dsn="XE")
     except Exception as err:
         print("Error en la conexion a la base: ", err) #mensaje de error
         print("Contacta con los desarrolladores. ")
