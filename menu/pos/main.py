@@ -17,10 +17,10 @@ def main():
         exit()
     else:
         print("Conectado a la base correctamente!", conexion.version) #mensaje de exito
-        print("Bienvenido a la gestion de la base de datos")
+        print("Bienvenido al Punto de Venta.")
         print("")
         print("-------------------------------------------")
-        print("---------- G E S T O C K - 1.0.0 ----------")
+        print("----------- VivaControl - 1.0.0 -----------")
         print("-------------------------------------------")
         print("")
 
