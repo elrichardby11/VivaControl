@@ -9,14 +9,12 @@ class FormMainDesign(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        #self.pos_app = PoS(self)
         self.logo = util_img.leer_imagen("/home/richard/Documentos/VivaControl/01.CODE/assets/VivaControl.png", (560, 136))
         self.perfil = util_img.leer_imagen("/home/richard/Documentos/VivaControl/01.CODE/assets/Profile.png", (100,100))
         self.config_window()
         self.panels()
         self.top_bar_controls()
         self.lateral_menu_controls()
-        #self.show_pos()
 
     def config_window(self):
         #Configuracion de la ventana inicial
@@ -74,9 +72,9 @@ class FormMainDesign(tk.Tk):
         self.buttonSettings = tk.Button(self.menu_lateral)
         
         buttons_info = [
-            ("PoS", "\uf109", self.buttonPoS),
-            ("Profile", "\uf007", self.buttonProfile),
-            ("Settings", "\uf013", self.buttonSettings)
+            ("Punto de Venta", "\uf07a", self.buttonPoS),
+            ("Perfil", "\uf007", self.buttonProfile),
+            ("Ajustes", "\uf013", self.buttonSettings)
         ]
 
         for text, icon, button in buttons_info:
@@ -90,7 +88,6 @@ class FormMainDesign(tk.Tk):
             subprocess.run(["python3", main_pos], check=True)
         except subprocess.CalledProcessError as e:
             print(f"Error al ejecutar {main_pos}: {e}")
-
 
     def config_button_menu(self, button, text, icon, font_awesome, width, height):
         button.config(text=f"   {icon}      {text}", anchor="w", font=font_awesome, bd=0,

@@ -13,7 +13,7 @@ class PoS():
         self.root.title("VivaControl - Punto de Venta")
         img = tk.PhotoImage(file='./assets/VivaControl.png')
         self.root.iconphoto(False,img)
-        self.root.geometry("710x380")
+        self.root.geometry("1280x400")
         self.products = products
         self.current_cart = {}
         self.create_widgets()
