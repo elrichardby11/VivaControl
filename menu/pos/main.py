@@ -8,8 +8,8 @@ def main():
 
     try:
         conexion=cx_Oracle.connect(
-        user="Juan_Rodriguez",
-        password="Mn3rP7oBsKxL#",
+        user="VivaControl",
+        password="T$g#kP2LMv8X",
         dsn="XE")
     except Exception as err:
         print("Error en la conexion a la base: ", err) #mensaje de error

@@ -1,6 +1,38 @@
 from datetime import datetime
+import cx_Oracle
+
 
 def save_to_file(self,current_cart, total_amount, payment_method, payment_quantity):
+
+    # Conectar a la base de datos Oracle
+    con = cx_Oracle.connect("VivaControl/T$g#kP2LMv8X@XE")
+
+    # Crear un cursor
+    cursor = con.cursor()
+
+    # Ejecutar la consulta SQL
+    cursor.execute("SELECT MAX(ID_MOVIMIENTO) FROM MOVIMIENTO")
+
+    # Obtener los resultados de la consulta
+    result = cursor.fetchone()
+    max_id = result[0] if result[0] is not None else 0  # Maneja el caso en el que no haya registros
+    # Incrementa el valor máximo en uno para obtener el nuevo ID
+    new_id = max_id + 1
+    fecha = datetime.now().strftime("%d/%m/%Y")
+    tipo_mov = 2
+    state = 1
+    rut = 1
+    query = "INSERT INTO MOVIMIENTO (ID_MOVIMIENTO, FECHA, ID_TIPO_MOVIMIENTO, CSTATE_MOVIMIENTO, RUT_AUXILIAR) VALUES (:id, TO_DATE(:fecha, 'dd/mm/yyyy'), :tipo, :state, :rut)"
+    cursor.execute(query, id=new_id, fecha=fecha, tipo=tipo_mov, state=state, rut=rut)
+    con.commit()
+
+    for code, quantity in current_cart.items():
+        product_code = code
+        precio = self.products[code]["price"]
+        query = "INSERT INTO DETALLE_MOV (ID_MOV, ID_PROD, CANTIDAD, PRECIO_UNITARIO) VALUES (:id_mov, :id_pro, :cant, :precio)"
+        cursor.execute(query, id_mov = new_id, id_pro = code, cant = quantity, precio = precio)
+        con.commit()
+
     now = datetime.now()
     #Nombre del Archivo
     filename = now.strftime("%Y-%m-%d_%H-%M-%S.txt")

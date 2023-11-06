@@ -1,29 +1,16 @@
-products = {
-            "7807265064173": {"name": "Producto 1", "price": 1000},
-            "7501007528427": {"name": "Producto 2", "price": 1500}
-            # Agrega más productos con su información
-        }
-
-
 
 
 import cx_Oracle
 
 
-
-
-
-
-"""""""""
-
 # Conectar a la base de datos Oracle
-connection = cx_Oracle.connect("Juan_Rodriguez/Mn3rP7oBsKxL#@9501")
+connection = cx_Oracle.connect("VivaControl/T$g#kP2LMv8X@XE")
 
 # Crear un cursor
 cursor = connection.cursor()
 
 # Ejecutar la consulta SQL
-cursor.execute("SELECT id_producto, nombre_producto, precio FROM productos;")
+cursor.execute("SELECT ID_PRODUCTO, NOMBRE, PRECIO FROM PRODUCTO")
 # Obtener los resultados de la consulta
 results = cursor.fetchall()
 
@@ -47,6 +34,8 @@ for row in results:
         products[id_producto]["price"] = precio
 
 # El diccionario 'products' ahora contiene los datos con el precio de venta más reciente
-print(products)
 
-"""""""""
+# Crea un nuevo diccionario con claves convertidas a texto
+products = {str(key): value for key, value in products.items()}
+
+print(products)
