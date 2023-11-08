@@ -1,7 +1,4 @@
-
-
 import cx_Oracle
-
 
 # Conectar a la base de datos Oracle
 connection = cx_Oracle.connect("VivaControl/T$g#kP2LMv8X@XE")
@@ -37,5 +34,3 @@ for row in results:
 
 # Crea un nuevo diccionario con claves convertidas a texto
 products = {str(key): value for key, value in products.items()}
-
-print(products)

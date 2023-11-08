@@ -9,23 +9,26 @@ def save_to_file(self,current_cart, total_amount, payment_method, payment_quanti
 
     # Crear un cursor
     cursor = con.cursor()
-
+    
     # Ejecutar la consulta SQL
     cursor.execute("SELECT MAX(ID_MOVIMIENTO) FROM MOVIMIENTO")
-
+    
     # Obtener los resultados de la consulta
     result = cursor.fetchone()
     max_id = result[0] if result[0] is not None else 0  # Maneja el caso en el que no haya registros
+    
     # Incrementa el valor máximo en uno para obtener el nuevo ID
     new_id = max_id + 1
     fecha = datetime.now().strftime("%d/%m/%Y")
-    tipo_mov = 2
-    state = 1
-    rut = 1
+    tipo_mov = 2    # Tipo 2 Venta
+    state = 1       # Estado Activo
+    rut = 1         # Rut generico Cliente
+
     query = "INSERT INTO MOVIMIENTO (ID_MOVIMIENTO, FECHA, ID_TIPO_MOVIMIENTO, CSTATE_MOVIMIENTO, RUT_AUXILIAR) VALUES (:id, TO_DATE(:fecha, 'dd/mm/yyyy'), :tipo, :state, :rut)"
     cursor.execute(query, id=new_id, fecha=fecha, tipo=tipo_mov, state=state, rut=rut)
     con.commit()
 
+    # Ciclo para detalle de movimiento, inserta 
     for code, quantity in current_cart.items():
         product_code = code
         precio = self.products[code]["price"]
@@ -34,7 +37,7 @@ def save_to_file(self,current_cart, total_amount, payment_method, payment_quanti
         con.commit()
 
     now = datetime.now()
-    #Nombre del Archivo
+    # Nombre del Archivo
     filename = now.strftime("%Y-%m-%d_%H-%M-%S.txt")
     formatted_date = now.strftime("Fecha: %d-%m-%Y")
     formatted_time = now.strftime("Hora: %H:%M:%S")
@@ -47,13 +50,13 @@ def save_to_file(self,current_cart, total_amount, payment_method, payment_quanti
         file.write("|                                                     |\n")
         file.write("|RUT: 11.111.111-1                                    |\n")
         file.write("|RAZON SOCIAL: FANTASIA S.A                           |\n")
-        file.write("|BLABLA NRO 999 - PISO 2234B                          |\n")
+        file.write("|BLABLA NRO 999 - PISO 1234B                          |\n")
         file.write("|LAS CONDES - SANTIAGO F. -256784321                  |\n")
-        file.write("|GIRO: VENTAS AL POR MENOS DE MERCADERIA              |\n")
+        file.write("|GIRO: VENTAS AL POR MENOR DE MERCADERIA              |\n")
         file.write("|_____________________________________________________|\n")
         file.write(f" {formatted_date}          {formatted_time}\n")
         file.write(" Boleta Electronica:        123.456.789\n")
-        file.write(" CAJA: 2 CAJERO: RICHARD MAZUELOS\n")
+        file.write(" CAJA: 1 CAJERO: RICHARD MAZUELOS\n")
         file.write(" D E T A L L E\n")
         file.write(" ---------------\n")
         
@@ -81,7 +84,12 @@ def save_to_file(self,current_cart, total_amount, payment_method, payment_quanti
             file.write(" =====================================================\n")
         else:
             file.write(f" {payment_method:<7}           $ {format_number(total_amount):>10}\n")
-            file.write(" Vuelto            $          0\n")
+            file.write(" Vuelto            $          0\n")        #self.w = customtkinter.CTk()
+        #self.w.geometry("1280x720")
+        #self.w.title('Welcome')
+        #self.l1 = customtkinter.CTkLabel(master=self.w, text="Home Page", font=('Century Gothic', 60))
+        #self.l1.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+        #self.w.mainloop()
             file.write(" =====================================================\n")
 
     print(f"Registro guardado en {filename}")

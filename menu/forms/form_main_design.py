@@ -4,12 +4,14 @@ import subprocess
 from config import color_barra_superior, color_cuerpo_principal, color_menu_cursor_encima, color_menu_lateral
 import useful.useful_assets as util_img
 import useful.useful_window as util_ventana
+from forms.form_info_design import FormInfoDesign
+from pos.pos import PoS
 
 class FormMainDesign(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        self.logo = util_img.leer_imagen("/home/richard/Documentos/VivaControl/01.CODE/assets/VivaControl.png", (560, 136))
+        #self.logo = util_img.leer_imagen("/home/richard/Documentos/VivaControl/01.CODE/assets/VivaControl.png", (560, 136))
         self.perfil = util_img.leer_imagen("/home/richard/Documentos/VivaControl/01.CODE/assets/Profile.png", (100,100))
         self.config_window()
         self.panels()
@@ -19,7 +21,7 @@ class FormMainDesign(tk.Tk):
     def config_window(self):
         #Configuracion de la ventana inicial
         self.title("VivaControl - Bienvenido")
-        #self.iconbitmap("/home/    /Documentos/VivaControl/01.CODE/assets/VivaControl.png")
+        #self.iconbitmap("../01.CODE/assets/VivaControl.png")
         w, h = 1024, 600
         #self.geometry("%dx%d+0+0" % w,h)
         util_ventana.centrar_ventana(self, w, h)
@@ -67,18 +69,20 @@ class FormMainDesign(tk.Tk):
         self.perfilLabel = tk.Label(self.menu_lateral, image=self.perfil, bg=color_menu_lateral)
         self.perfilLabel.pack(side=tk.TOP, pady=10, padx=2)
 
-        self.buttonPoS = tk.Button(self.menu_lateral, command=self.show_pos)
+        self.buttonPoS = tk.Button(self.menu_lateral)
         self.buttonProfile = tk.Button(self.menu_lateral)
+        self.buttonInfo = tk.Button(self.menu_lateral)
         self.buttonSettings = tk.Button(self.menu_lateral)
         
         buttons_info = [
-            ("Punto de Venta", "\uf07a", self.buttonPoS),
-            ("Perfil", "\uf007", self.buttonProfile),
-            ("Ajustes", "\uf013", self.buttonSettings)
+            ("Punto de Venta", "\uf07a", self.buttonPoS, self.open_pos),
+            ("Perfil", "\uf007", self.buttonProfile,  self.open_panel_info),
+            ("  Info", "\uf129", self.buttonInfo,  self.open_panel_info),
+            ("Ajustes", "\uf013", self.buttonSettings,  self.open_panel_info)
         ]
 
-        for text, icon, button in buttons_info:
-            self.config_button_menu(button, text, icon, font_awesome, width, height)
+        for text, icon, button, comando in buttons_info:
+            self.config_button_menu(button, text, icon, font_awesome, width, height, comando)
 
     def show_pos(self, event=None):
         self.destroy()
@@ -89,9 +93,10 @@ class FormMainDesign(tk.Tk):
         except subprocess.CalledProcessError as e:
             print(f"Error al ejecutar {main_pos}: {e}")
 
-    def config_button_menu(self, button, text, icon, font_awesome, width, height):
+    def config_button_menu(self, button, text, icon, font_awesome, width, height, comando):
         button.config(text=f"   {icon}      {text}", anchor="w", font=font_awesome, bd=0,
-                      bg=color_menu_lateral, fg="white", width=width, height=height)
+                      bg=color_menu_lateral, fg="white", width=width, height=height,
+                      command=comando)
         button.pack(side=tk.TOP)
         self.bind_hover_events(button)
 
@@ -115,3 +120,8 @@ class FormMainDesign(tk.Tk):
         else:
             self.menu_lateral.pack(side=tk.LEFT, fill="y")
 
+    def open_panel_info(self):
+        FormInfoDesign()
+
+    def open_pos(self):
+        PoS.main()
