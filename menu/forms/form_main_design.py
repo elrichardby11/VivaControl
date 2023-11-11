@@ -5,7 +5,7 @@ from config import color_barra_superior, color_cuerpo_principal, color_menu_curs
 import useful.useful_assets as util_img
 import useful.useful_window as util_ventana
 from forms.form_info_design import FormInfoDesign
-from pos.pos import PoS
+import time
 
 class FormMainDesign(tk.Tk):
 
@@ -84,15 +84,6 @@ class FormMainDesign(tk.Tk):
         for text, icon, button, comando in buttons_info:
             self.config_button_menu(button, text, icon, font_awesome, width, height, comando)
 
-    def show_pos(self, event=None):
-        self.destroy()
-        #self.withdraw()  # Oculta la ventana del menú
-        main_pos = '../01.CODE/menu/pos/main.py'
-        try:
-            subprocess.run(["python3", main_pos], check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"Error al ejecutar {main_pos}: {e}")
-
     def config_button_menu(self, button, text, icon, font_awesome, width, height, comando):
         button.config(text=f"   {icon}      {text}", anchor="w", font=font_awesome, bd=0,
                       bg=color_menu_lateral, fg="white", width=width, height=height,
@@ -123,5 +114,26 @@ class FormMainDesign(tk.Tk):
     def open_panel_info(self):
         FormInfoDesign()
 
-    def open_pos(self):
-        PoS.main()
+    def open_pos(self): 
+
+        main_pos = '../01.CODE/menu/pos/main.py'
+        try:
+            self.proceso = subprocess.Popen(["python3", main_pos])
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar {main_pos}: {e}")
+
+        # Ocultar la ventana temporalmente
+        self.withdraw()
+
+        # Verificar el estado del proceso en intervalos regulares
+        while True:
+            if self.proceso.poll() is not None:
+                # El proceso ha terminado, puedes mostrar la ventana
+                self.deiconify()
+                break
+
+            # Pausa para evitar un uso excesivo de la CPU
+            time.sleep(0.2)
+
+    def main(self):
+        self.mainloop()

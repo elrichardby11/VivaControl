@@ -4,12 +4,13 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from datetime import datetime 
-from pos.file_operations import save_to_file
-from pos.products import products
+from file_operations import save_to_file
+from products import products
+
 
 class PoS():
 
-    def __init__(self, root, **kwargs):
+    def __init__(self, root):
         self.root = root
         self.root.title("VivaControl - Punto de Venta")
         #self.root.geometry("1280x400")
@@ -39,6 +40,8 @@ class PoS():
         self.scan_entry = tk.Entry(left_frame)
         self.scan_entry.grid(row=2, column=0, padx=10, pady=0)
         self.scan_entry.focus_set()
+
+        self.scan_entry.bind('<Return>', self.add_to_cart)
 
         self.add_to_cart_button = tk.Button(left_frame, text="Agregar al carrito", command=self.add_to_cart)
         self.add_to_cart_button.grid(row=3, column=0, padx=10, pady=5)
@@ -82,6 +85,9 @@ class PoS():
 
         self.scan_entry2 = tk.Entry(right_frame, state="disabled")
         self.scan_entry2.grid(row=5, column=0, padx=10, pady=5)
+
+        self.scan_entry2.bind('<Return>', self.payment)
+
 
         self.edit_button = tk.Button(right_frame, text="Editar", command=self.edit_quantity)
         self.edit_button.grid(row=6, column=0, padx=10, pady=2)
@@ -219,7 +225,10 @@ class PoS():
         self.message_label.config(text="Carrito vacío", fg="black")
 
     def exit(self):
+
         self.root.destroy()
+        #FormMainDesign().mostrar_ventana()
+        
 
     def toggle_fullscreen(self, event=None):
         self.state = not self.state
@@ -228,9 +237,3 @@ class PoS():
     def quit_fullscreen(self, event=None):
         self.state = False
         self.root.attributes("-fullscreen", self.state)
-
-    def main():
-        root = tk.Tk()
-        app = PoS(root) 
-        app.update_time() # Programar la primera actualización
-        root.mainloop()

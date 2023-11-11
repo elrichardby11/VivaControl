@@ -10,7 +10,7 @@ class Login:
         customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
         customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
         self.root.geometry("600x440")
-        self.root.title('Login')
+        self.root.title('VivaControl - Login')
         self.widgets()
 
     def widgets(self):
@@ -25,21 +25,34 @@ class Login:
         self.l2 = customtkinter.CTkLabel(master=self.frame, text="Inicio Sesión", font=('Century Gothic', 20))
         self.l2.place(x=105, y=45)
 
+        text_var = tkinter.StringVar(value="")
+        
+        self.label2 = customtkinter.CTkLabel(master=self.frame,
+                                    textvariable=text_var,
+                                    font=('Century Gothic', 10),
+                                    width=220,
+                                    height=25,
+                                    text_color="black",
+                                    fg_color="transparent",
+                                    #fg_color=("#ffa372", "gray75"),
+                                    corner_radius=5)
+        self.label2.place(x=160, y=90, anchor=tkinter.CENTER)
+
         self.nombre_de_usuario = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Nombre de Usuario')
-        self.nombre_de_usuario.place(x=50, y=110)
+        self.nombre_de_usuario.place(x=50, y=115)
 
         self.contrasena = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Contraseña', show="*")
-        self.contrasena.place(x=50, y=165)
+        self.contrasena.place(x=50, y=170)
 
         # Evento Pulsar Enter
         self.contrasena.bind('<Return>', self.registrar_usuario)
 
-        self.l3 = customtkinter.CTkLabel(master=self.frame, text="Contraseña Olvidada?", font=('Century Gothic', 12))
-        self.l3.place(x=155, y=195)
+        self.l4 = customtkinter.CTkLabel(master=self.frame, text="Contraseña Olvidada?", font=('Century Gothic', 12))
+        self.l4.place(x=155, y=200)
 
         # Create custom button
         self.button1 = customtkinter.CTkButton(master=self.frame, width=220, text="Iniciar Sesión", command= self.verificar_credenciales, corner_radius=6)
-        self.button1.place(x=50, y=240)
+        self.button1.place(x=50, y=245)
 
     def button_function(self, event=None):
 
@@ -71,6 +84,9 @@ class Login:
                 usuario, contrasena = linea.strip().split(',')
                 if usuario == nombre_de_usuario and contrasena == contrasena_ingresada:
                     self.button_function(self)
+                else:
+                    self.text_var = tkinter.StringVar(value="Credenciales Incorrectas.")
+                    self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
 
 def main():
     # You can easily integrate authentication system
