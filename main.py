@@ -63,13 +63,6 @@ class Login:
         except subprocess.CalledProcessError as e:
             print(f"Error al ejecutar {main_pos}: {e}")
 
-        #self.w = customtkinter.CTk()
-        #self.w.geometry("1280x720")
-        #self.w.title('Welcome')
-        #self.l1 = customtkinter.CTkLabel(master=self.w, text="Home Page", font=('Century Gothic', 60))
-        #self.l1.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
-        #self.w.mainloop()
-
     def registrar_usuario(self, event=None):
         self.nombre = self.nombre_de_usuario.get()
         self.password = self.contrasena.get()

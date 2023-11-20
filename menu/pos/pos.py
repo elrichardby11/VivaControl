@@ -5,11 +5,12 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from datetime import datetime 
 from file_operations import save_to_file
-from products import products
-
+from products import search_products
+from locals import locals
 
 class PoS():
 
+    #   Configuracion de ventana
     def __init__(self, root):
         self.root = root
         self.root.title("VivaControl - Punto de Venta")
@@ -21,15 +22,18 @@ class PoS():
         root.bind("<F11>", self.toggle_fullscreen)  # Atajo de teclado para alternar la pantalla completa
         root.bind("<Escape>", self.quit_fullscreen)  # Atajo de teclado para salir de pantalla completa
 
-        self.products = products
         self.current_cart = {}
         self.create_widgets()
 
+        self.locals = locals
+        self.previous_local = []
+
+    #   Crea los botones, textos, etc
     def create_widgets(self):
 
         # Izquierda
         left_frame = tk.Frame(self.root)
-        left_frame.grid(row=0, column=0, padx=10, pady=50, sticky="nsew")
+        left_frame.grid(row=0, column=0, padx=10, pady=30, sticky="nsew")
 
         self.time_label = tk.Label(left_frame, text="")
         self.time_label.grid(row=0, column=0)
@@ -73,33 +77,42 @@ class PoS():
         right_frame = tk.Frame(self.root)
         right_frame.grid(row=0, column=1, padx=10, pady=250, sticky="nsew")
 
+        self.local_label = tk.Label(right_frame, text="Selecciona la sucursal:")
+        self.local_label.grid(row=0, column=0, padx=5)
+
+        self.local_options = ttk.Combobox(right_frame, values=locals, state="readonly")
+        self.local_options.bind("<FocusOut>", self.add_local_history)
+        self.local_options.bind("<<ComboboxSelected>>", self.handle_local_selection)
+        self.local_options.grid(row=2, column=0, padx=5)
+
+        self.label = tk.Label(right_frame, text="")
+        self.label.grid(row=3, column=0, pady=30)
+
         self.payment_label = tk.Label(right_frame, text="Selecciona el método de pago:")
-        self.payment_label.grid(row=2, column=0, padx=5)
+        self.payment_label.grid(row=4, column=0, padx=5)
 
         self.payment_options = ttk.Combobox(right_frame, values=['Efectivo', 'Débito', 'Crédito'], state="readonly")
         self.payment_options.bind("<<ComboboxSelected>>", self.handle_payment_selection)
-        self.payment_options.grid(row=3, column=0, padx=10, pady=5)
+        self.payment_options.grid(row=5, column=0, padx=10, pady=5)
 
         self.message_label2 = tk.Label(right_frame, text="Monto en Efectivo: ", fg="black")
-        self.message_label2.grid(row=4, column=0, padx=10, pady=5)
+        self.message_label2.grid(row=6, column=0, padx=10, pady=5)
 
         self.scan_entry2 = tk.Entry(right_frame, state="disabled")
-        self.scan_entry2.grid(row=5, column=0, padx=10, pady=5)
-
+        self.scan_entry2.grid(row=7, column=0, padx=10, pady=5)
         self.scan_entry2.bind('<Return>', self.payment)
 
-
         self.edit_button = tk.Button(right_frame, text="Editar", command=self.edit_quantity)
-        self.edit_button.grid(row=6, column=0, padx=10, pady=2)
+        self.edit_button.grid(row=8, column=0, padx=10, pady=2)
 
         self.remove_button = tk.Button(right_frame, text="Eliminar", command=self.remove_product)
-        self.remove_button.grid(row=7, column=0, padx=10, pady=2)
+        self.remove_button.grid(row=9, column=0, padx=10, pady=2)
 
         self.payment_button = tk.Button(right_frame, text="Pagar", command=self.payment)
-        self.payment_button.grid(row=8, column=0, padx=10, pady=2)
+        self.payment_button.grid(row=10, column=0, padx=10, pady=2)
 
         self.close_button = tk.Button(right_frame, text="Salir", command=self.exit)
-        self.close_button.grid(row=9, column=0, padx=10, pady=50)
+        self.close_button.grid(row=11, column=0, padx=10, pady=50)
 
     #   Actualizar Tiempo
     def update_time(self):
@@ -116,19 +129,24 @@ class PoS():
     #   Evento Añadir al Carrito        
     def add_to_cart(self, event=None):
         product_code = self.scan_entry.get()
-        if product_code in self.products:
-            if product_code in self.current_cart:
-                self.current_cart[product_code] += 1
-            else:
-                self.current_cart[product_code] = 1
+        selected_local = self.local_options.get()
+        if (selected_local) != "":
+            self.products = search_products(selected_local[0])
+            if product_code in self.products:
+                if product_code in self.current_cart:
+                    self.current_cart[product_code] += 1
+                else:
+                    self.current_cart[product_code] = 1
 
-            self.message_label.config(text=f"Elemento escaneado: {product_code}", fg="green")
-            self.update_subtotal()
-            self.update_cart_listbox()
+                self.message_label.config(text=f"Elemento escaneado: {product_code}", fg="green")
+                self.update_subtotal()
+                self.update_cart_listbox()
+            else:
+                self.message_label.config(text=f"Producto no encontrado {product_code}",fg="red")
+            # Borra el contenido del campo Entry
+            self.scan_entry.delete(0, tk.END)
         else:
-            self.message_label.config(text=f"Producto no encontrado {product_code}",fg="red")
-        # Borra el contenido del campo Entry
-        self.scan_entry.delete(0, tk.END)
+           self.message_label.config(text="Porfavor, seleccione un local",fg="red")
 
     #   Imprime valores del producto en el carrito
     def update_cart_listbox(self):
@@ -176,9 +194,24 @@ class PoS():
             self.scan_entry2.delete(0, tk.END)
             self.scan_entry2.config(state="disabled")
 
+    def add_local_history(self, event):
+
+        selected_local = self.local_options.get()
+        self.previous_local.append(selected_local)
+
+    def handle_local_selection(self, event):
+
+        if (self.cart_listbox.size() != 0) and len(self.previous_local) > 2:
+            self.message_label.config(text="Vacie el carrito antes de cambiar de sucursal", fg="red")
+            previous_selection = self.previous_local.pop()
+            self.local_options.set(previous_selection)
+
     #   Configuracion y condiciones de Metodos de pago
     def payment(self, event=None):
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
+        local = self.local_options.get()
+        local = str(local)
+        local = local.replace(local, local[0])
         if (total_amount == 0):
             self.message_label.config(text="Por favor, agrega un producto.", fg="red")
             return
@@ -196,7 +229,7 @@ class PoS():
                 else:
                     payment_confirmation = f"Total a pagar: ${total_amount}\nMétodo de pago: {payment_method}\nVuelto: ${payment_quantity-total_amount}"
                     if tk.messagebox.askyesno("Confirmar Pago", payment_confirmation):
-                        save_to_file(self, self.current_cart, total_amount, payment_method, payment_quantity)
+                        save_to_file(self, self.current_cart, total_amount, payment_method, payment_quantity, local)
                         self.clear_cart()
                     else:
                         self.message_label.config(text="Pago no confirmado", fg="red")
@@ -207,7 +240,7 @@ class PoS():
                 payment_quantity=total_amount
                 payment_confirmation = f"Total a pagar: ${total_amount}\nMétodo de pago: {payment_method}"
                 if tk.messagebox.askyesno("Confirmar Pago", payment_confirmation):
-                    save_to_file(self, self.current_cart, total_amount, payment_method, payment_quantity)
+                    save_to_file(self, self.current_cart, total_amount, payment_method, payment_quantity, local)
                     self.clear_cart()
                 else:
                     self.message_label.config(text="Pago no confirmado", fg="red")
@@ -224,16 +257,18 @@ class PoS():
         self.scan_entry.focus_set()
         self.message_label.config(text="Carrito vacío", fg="black")
 
+    #   Cierra el programa
     def exit(self):
 
         self.root.destroy()
         #FormMainDesign().mostrar_ventana()
-        
-
+  
+    #   Ajusta pantalla completa
     def toggle_fullscreen(self, event=None):
         self.state = not self.state
         self.root.attributes("-fullscreen", self.state)
-
+  
+    #   Quita pantalla completa
     def quit_fullscreen(self, event=None):
         self.state = False
         self.root.attributes("-fullscreen", self.state)

@@ -135,5 +135,3 @@ class FormMainDesign(tk.Tk):
             # Pausa para evitar un uso excesivo de la CPU
             time.sleep(0.2)
 
-    def main(self):
-        self.mainloop()

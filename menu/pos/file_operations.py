@@ -2,7 +2,7 @@ from datetime import datetime
 import cx_Oracle
 
 
-def save_to_file(self,current_cart, total_amount, payment_method, payment_quantity):
+def save_to_file(self,current_cart, total_amount, payment_method, payment_quantity, local):
 
     # Conectar a la base de datos Oracle
     con = cx_Oracle.connect("VivaControl/T$g#kP2LMv8X@XE")
@@ -20,20 +20,22 @@ def save_to_file(self,current_cart, total_amount, payment_method, payment_quanti
     # Incrementa el valor máximo en uno para obtener el nuevo ID
     new_id = max_id + 1
     fecha = datetime.now().strftime("%d/%m/%Y")
+    periodo = int(datetime.now().strftime("%Y"))
     tipo_mov = 2    # Tipo 2 Venta
     state = 1       # Estado Activo
     rut = 1         # Rut generico Cliente
 
-    query = "INSERT INTO MOVIMIENTO (ID_MOVIMIENTO, FECHA, ID_TIPO_MOVIMIENTO, CSTATE_MOVIMIENTO, RUT_AUXILIAR) VALUES (:id, TO_DATE(:fecha, 'dd/mm/yyyy'), :tipo, :state, :rut)"
-    cursor.execute(query, id=new_id, fecha=fecha, tipo=tipo_mov, state=state, rut=rut)
+
+    query = "INSERT INTO MOVIMIENTO (ID_MOVIMIENTO, FECHA, ID_TIPO_MOVIMIENTO, PERIODO, CSTATE_MOVIMIENTO, RUT_AUXILIAR) VALUES (:id, TO_DATE(:fecha, 'dd/mm/yyyy'), :tipo, :periodo, :state, :rut)"
+    cursor.execute(query, id=new_id, fecha=fecha, tipo=tipo_mov, periodo=periodo, state=state, rut=rut)
     con.commit()
 
     # Ciclo para detalle de movimiento, inserta 
     for code, quantity in current_cart.items():
         product_code = code
         precio = self.products[code]["price"]
-        query = "INSERT INTO DETALLE_MOV (ID_MOV, ID_PROD, CANTIDAD, PRECIO_UNITARIO) VALUES (:id_mov, :id_pro, :cant, :precio)"
-        cursor.execute(query, id_mov = new_id, id_pro = code, cant = quantity, precio = precio)
+        query = "INSERT INTO DETALLE_MOV (ID_MOV, ID_PROD, ID_SUCURSAL, CANTIDAD, PRECIO_UNITARIO) VALUES (:id_mov, :id_pro, :id_suc, :cant, :precio)"
+        cursor.execute(query, id_mov = new_id, id_pro = code, id_suc = local, cant = quantity, precio = precio)
         con.commit()
 
     now = datetime.now()
