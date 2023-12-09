@@ -146,7 +146,7 @@ class PoS():
             # Borra el contenido del campo Entry
             self.scan_entry.delete(0, tk.END)
         else:
-           self.message_label.config(text="Porfavor, seleccione un local",fg="red")
+           self.message_label.config(text="Por favor, seleccione un local",fg="red")
 
     #   Imprime valores del producto en el carrito
     def update_cart_listbox(self):
@@ -210,8 +210,14 @@ class PoS():
     def payment(self, event=None):
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
         local = self.local_options.get()
-        local = str(local)
-        local = local.replace(local, local[0])
+        print(local)
+        if local != "":
+            local = str(local)
+            local = local.replace(local, local[0])
+            print(local)
+        else:
+            self.message_label.config(text="Por favor, selecciona una sucursal.", fg="red")
+
         if (total_amount == 0):
             self.message_label.config(text="Por favor, agrega un producto.", fg="red")
             return

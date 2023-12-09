@@ -41,11 +41,14 @@ class Login:
         self.nombre_de_usuario = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Nombre de Usuario')
         self.nombre_de_usuario.place(x=50, y=115)
 
+        #self.nombre_de_usuario.insert(0, "Texto predeterminado")
+        #self.nombre_de_usuario.bind("<FocusOut>", lambda args: self.nombre_de_usuario.delete(0,"end"))
+
         self.contrasena = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Contraseña', show="*")
         self.contrasena.place(x=50, y=170)
 
-        # Evento Pulsar Enter
-        self.contrasena.bind('<Return>', self.registrar_usuario)
+        # Evento Pulsar Enters
+        self.contrasena.bind('<Return>', self.verificar_credenciales)
 
         self.l4 = customtkinter.CTkLabel(master=self.frame, text="Contraseña Olvidada?", font=('Century Gothic', 12))
         self.l4.place(x=155, y=200)
@@ -69,7 +72,7 @@ class Login:
         with open('../01.CODE/usuarios.txt', 'a') as archivo:
             archivo.write(f"{self.nombre},{self.password}\n")
 
-    def verificar_credenciales(self):
+    def verificar_credenciales(self, event=None):
         nombre_de_usuario = self.nombre_de_usuario.get()
         contrasena_ingresada = self.contrasena.get()
         with open('../01.CODE/usuarios.txt', 'r') as archivo:

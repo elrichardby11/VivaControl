@@ -70,15 +70,17 @@ class FormMainDesign(tk.Tk):
         self.perfilLabel.pack(side=tk.TOP, pady=10, padx=2)
 
         self.buttonPoS = tk.Button(self.menu_lateral)
+        self.buttonAux = tk.Button(self.menu_lateral)
         self.buttonProfile = tk.Button(self.menu_lateral)
         self.buttonInfo = tk.Button(self.menu_lateral)
         self.buttonSettings = tk.Button(self.menu_lateral)
         
         buttons_info = [
             ("Punto de Venta", "\uf07a", self.buttonPoS, self.open_pos),
-            ("Perfil", "\uf007", self.buttonProfile,  self.open_panel_info),
-            ("  Info", "\uf129", self.buttonInfo,  self.open_panel_info),
-            ("Ajustes", "\uf013", self.buttonSettings,  self.open_panel_info)
+            ("Auxiliares", "\uf0c0", self.buttonAux, self.open_aux),
+            ("Perfil", "\uf4ff", self.buttonProfile,  self.open_panel_info),
+            (" Info", "\uf05a", self.buttonInfo,  self.open_panel_info),
+            (" Ajustes", "\uf013", self.buttonSettings,  self.open_panel_info)
         ]
 
         for text, icon, button, comando in buttons_info:
@@ -117,6 +119,27 @@ class FormMainDesign(tk.Tk):
     def open_pos(self): 
 
         main_pos = '../01.CODE/menu/pos/main.py'
+        try:
+            self.proceso = subprocess.Popen(["python3", main_pos])
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar {main_pos}: {e}")
+
+        # Ocultar la ventana temporalmente
+        self.withdraw()
+
+        # Verificar el estado del proceso en intervalos regulares
+        while True:
+            if self.proceso.poll() is not None:
+                # El proceso ha terminado, puedes mostrar la ventana
+                self.deiconify()
+                break
+
+            # Pausa para evitar un uso excesivo de la CPU
+            time.sleep(0.2)
+
+    def open_aux(self): 
+
+        main_pos = '../01.CODE/menu/aux/main.py'
         try:
             self.proceso = subprocess.Popen(["python3", main_pos])
         except subprocess.CalledProcessError as e:
