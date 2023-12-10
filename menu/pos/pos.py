@@ -210,11 +210,9 @@ class PoS():
     def payment(self, event=None):
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
         local = self.local_options.get()
-        print(local)
         if local != "":
             local = str(local)
             local = local.replace(local, local[0])
-            print(local)
         else:
             self.message_label.config(text="Por favor, selecciona una sucursal.", fg="red")
 
