@@ -5,6 +5,8 @@ from config import color_barra_superior, color_cuerpo_principal, color_menu_curs
 import useful.useful_assets as util_img
 import useful.useful_window as util_ventana
 from forms.form_info_design import FormInfoDesign
+from aux.aux import Auxiliares
+from pos.pos import PoS
 import time
 
 class FormMainDesign(tk.Tk):
@@ -17,6 +19,10 @@ class FormMainDesign(tk.Tk):
         self.panels()
         self.top_bar_controls()
         self.lateral_menu_controls()
+
+        # Inicializar las ventanas secundarias
+        self.ventanas_secundarias = {}
+        self.submenu_actual = None
 
     def config_window(self):
         #Configuracion de la ventana inicial
@@ -76,8 +82,8 @@ class FormMainDesign(tk.Tk):
         self.buttonSettings = tk.Button(self.menu_lateral)
         
         buttons_info = [
-            ("Punto de Venta", "\uf07a", self.buttonPoS, self.open_pos),
-            ("Auxiliares", "\uf0c0", self.buttonAux, self.open_aux),
+            ("Punto de Venta", "\uf07a", self.buttonPoS, lambda: self.abrir_ventana_secundaria(PoS)),
+            ("Auxiliares", "\uf0c0", self.buttonAux, lambda: self.abrir_ventana_secundaria(Auxiliares)),
             ("Perfil", "\uf4ff", self.buttonProfile,  self.open_panel_info),
             (" Info", "\uf05a", self.buttonInfo,  self.open_panel_info),
             (" Ajustes", "\uf013", self.buttonSettings,  self.open_panel_info)
@@ -115,46 +121,28 @@ class FormMainDesign(tk.Tk):
 
     def open_panel_info(self):
         FormInfoDesign()
+   
+    def abrir_ventana_secundaria(self, clase_ventana):
+        nombre_clase = clase_ventana.__name__
 
-    def open_pos(self): 
+        if self.submenu_actual and self.submenu_actual != nombre_clase:
 
-        main_pos = '../01.CODE/menu/pos/main.py'
-        try:
-            self.proceso = subprocess.Popen(["python3", main_pos])
-        except subprocess.CalledProcessError as e:
-            print(f"Error al ejecutar {main_pos}: {e}")
+            # Cerrar la ventana secundaria si hay alguna abierta
+            self.cerrar_ventana_secundaria()
 
-        # Ocultar la ventana temporalmente
-        self.withdraw()
+        if nombre_clase not in self.ventanas_secundarias or not self.ventanas_secundarias[nombre_clase].visible:
+            self.ventanas_secundarias[nombre_clase] = clase_ventana(self.cuerpo_principal)
+            self.title(f"VivaControl - {nombre_clase}")
 
-        # Verificar el estado del proceso en intervalos regulares
-        while True:
-            if self.proceso.poll() is not None:
-                # El proceso ha terminado, puedes mostrar la ventana
-                self.deiconify()
-                break
+        else:
+            self.ventanas_secundarias[nombre_clase].mostrar()
 
-            # Pausa para evitar un uso excesivo de la CPU
-            time.sleep(0.2)
+        # Actualizar el submenu actual
+        self.submenu_actual = nombre_clase
 
-    def open_aux(self): 
 
-        main_pos = '../01.CODE/menu/aux/main.py'
-        try:
-            self.proceso = subprocess.Popen(["python3", main_pos])
-        except subprocess.CalledProcessError as e:
-            print(f"Error al ejecutar {main_pos}: {e}")
-
-        # Ocultar la ventana temporalmente
-        self.withdraw()
-
-        # Verificar el estado del proceso en intervalos regulares
-        while True:
-            if self.proceso.poll() is not None:
-                # El proceso ha terminado, puedes mostrar la ventana
-                self.deiconify()
-                break
-
-            # Pausa para evitar un uso excesivo de la CPU
-            time.sleep(0.2)
+    def cerrar_ventana_secundaria(self):
+        if self.submenu_actual in self.ventanas_secundarias:
+            self.ventanas_secundarias[self.submenu_actual].ocultar()
+            self.submenu_actual = None
 

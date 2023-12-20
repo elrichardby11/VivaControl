@@ -3,13 +3,15 @@ from tkinter import ttk, messagebox, simpledialog, scrolledtext as st
 from tkinter import *
 from datetime import datetime
 import cx_Oracle
+from config import color_cuerpo_principal
 
-class aux():
+class Auxiliares():
     
     def __init__(self, root):
         self.root = root
-        self.root.title("VivaControl - Auxiliares")
-        self.root.geometry("1280x720")
+        #self.root.title("VivaControl - Auxiliares")
+        #self.root.geometry("1280x720")
+        self.visible = False
         self.create_widgets()
 
         self.resultados = {}
@@ -18,11 +20,11 @@ class aux():
     def create_widgets(self):
 
         # Etiqueta de tiempo
-        self.time_label = tk.Label(self.root, text="")
+        self.time_label = tk.Label(self.root, text="", bg=color_cuerpo_principal)
         self.time_label.place(relx=0.50, rely=0.025, anchor="center")
 
         # Etiqueta de búsqueda
-        self.scan_label = tk.Label(self.root, text="Ingrese el texto a buscar:")
+        self.scan_label = tk.Label(self.root, text="Ingrese el texto a buscar:", bg=color_cuerpo_principal)
         self.scan_label.place(relx=0.02, rely=0.075)
 
         # Campo de entrada
@@ -40,7 +42,7 @@ class aux():
         self.button_clear.place(relx=0.75, rely=0.103)
 
         # Etiqueta de modo de búsqueda
-        self.scan_label = tk.Label(self.root, text="Seleccione modo de búsqueda:", anchor="center")
+        self.scan_label = tk.Label(self.root, text="Seleccione modo de búsqueda:", anchor="center", bg=color_cuerpo_principal)
         self.scan_label.place(relx=0.02, rely=0.175)
 
         # Selección de método de búsqueda
@@ -49,7 +51,7 @@ class aux():
         self.type_options.place(relx=0.02, rely=0.205, relwidth=0.175)
 
         # Etiqueta de tipo de auxiliar
-        self.scan_label2 = tk.Label(self.root, text="Seleccione tipo de auxiliar:", anchor="center")
+        self.scan_label2 = tk.Label(self.root, text="Seleccione tipo de auxiliar:", anchor="center", bg=color_cuerpo_principal)
         self.scan_label2.place(relx=0.275, rely=0.175)
 
         # Selección de método de búsqueda
@@ -59,20 +61,21 @@ class aux():
 
         # Shared variable for radiobuttons
         self.selected_option = tk.IntVar()
+        
 
         # Etiqueta de tipo activo
-        self.scan_label3 = ttk.LabelFrame(self.root, text="Activo:")
+        self.scan_label3 = tk.LabelFrame(self.root, text="Activo:", bg=color_cuerpo_principal)
         self.scan_label3.place(relx=0.5, rely=0.175, relwidth=0.15, relheight=0.075)
 
-        self.radiobutton_yes = ttk.Radiobutton(self.scan_label3, text="Si", value=0, variable=self.selected_option)
+        self.radiobutton_yes = tk.Radiobutton(self.scan_label3, text="Si", value=0, variable=self.selected_option, bg=color_cuerpo_principal)
         self.radiobutton_yes.place(relx=0.05, rely=0.05, relwidth=0.45, relheight=0.8)
 
-        self.radiobutton_no = ttk.Radiobutton(self.scan_label3, text="No", value=1, variable=self.selected_option)
+        self.radiobutton_no = tk.Radiobutton(self.scan_label3, text="No", value=1, variable=self.selected_option, bg=color_cuerpo_principal)
         self.radiobutton_no.place(relx=0.5, rely=0.05, relwidth=0.45, relheight=0.8)
 
 
         # Etiqueta de error
-        self.error_label = tk.Label(self.root, text="", fg="red")
+        self.error_label = tk.Label(self.root, text="", fg="red", bg=color_cuerpo_principal)
         self.error_label.place(relx=0.5, rely=0.285, anchor="center")
 
         self.tree = ttk.Treeview(self.root, height=0, columns=("col2", "col3", "col4"))
@@ -90,20 +93,13 @@ class aux():
         self.list_aux = st.ScrolledText(self.root, wrap=tk.WORD, borderwidth=2, width=140, height=20)
         self.list_aux.place(relx=0.02, rely=0.35, relwidth=0.95)
 
-        # Botones agrupados
-        #button_frame = tk.Frame(self.root)
-        #button_frame.grid(row=8, column=0, columnspan=2, padx=10, pady=10, sticky="w")
-
         self.button_view = tk.Button(self.root, text="   Ver   ", command=self.view)
         self.button_view.place(relx=0.02, rely=0.9)
 
         self.button_edit = tk.Button(self.root, text=" Editar ", command=self.edit)
         self.button_edit.place(relx=0.10, rely=0.9)
-
-        self.button_exit = tk.Button(self.root, text="  Salir  ", command=self.exit)
-        self.button_exit.place(relx=0.26, rely=0.9)
         
-    #   Actualizar tiempo
+    #   Actualizar Tiempo
     def update_time(self):
         current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         self.time_label.config(text=f"Fecha actual: {current_time}")
@@ -195,7 +191,7 @@ class aux():
         else:
             self.error_label.config(fg="red", text="Por favor, seleccione un metodo de busqueda")
 
-
+    #   Actualizar Lista
     def update_list(self):        
         self.clear_list()
 
@@ -205,8 +201,6 @@ class aux():
             self.list_aux.insert(tk.END,"{:>15}-{:<15} {:<40} {:<50} {:<10}\n".format(str(rut), str(info['dv']), info['name'], info['address'], str(info['phone_number'])))
        
         self.list_aux.configure(state=tk.DISABLED)
-
-
 
     #   Ver Auxiliar
     def view(self):
@@ -228,7 +222,13 @@ class aux():
         self.list_aux.delete("1.0", tk.END)
         self.list_aux.configure(state=tk.DISABLED)
 
+    def ocultar(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.visible = False
+    
+    def mostrar(self):
+        for widget in self.root.winfo_children():
+            widget.place()
+        self.visible = True
 
-    #   Salir del Programa
-    def exit(self): 
-        self.root.destroy()

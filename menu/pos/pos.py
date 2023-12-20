@@ -4,29 +4,31 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from datetime import datetime 
-from file_operations import save_to_file
-from products import search_products
-from locals import locals
+from pos.file_operations import save_to_file
+from pos.products import search_products
+from pos.locals import locals
 
 class PoS():
 
     #   Configuracion de ventana
     def __init__(self, root):
         self.root = root
-        self.root.title("VivaControl - Punto de Venta")
+        self.visible = False
+
+        #self.root.title("VivaControl - Punto de Venta")
         #self.root.geometry("1280x400")
 
-        self.state = False
-        root.attributes("-fullscreen", self.state)  # Configura el modo de pantalla completa
+        #self.state = False
+        #root.attributes("-fullscreen", self.state)  # Configura el modo de pantalla completa
 
-        root.bind("<F11>", self.toggle_fullscreen)  # Atajo de teclado para alternar la pantalla completa
-        root.bind("<Escape>", self.quit_fullscreen)  # Atajo de teclado para salir de pantalla completa
+        #root.bind("<F11>", self.toggle_fullscreen)  # Atajo de teclado para alternar la pantalla completa
+        #root.bind("<Escape>", self.quit_fullscreen)  # Atajo de teclado para salir de pantalla completa
 
         self.current_cart = {}
-        self.create_widgets()
-
         self.locals = locals
         self.previous_local = []
+
+        self.create_widgets()
 
     #   Crea los botones, textos, etc
     def create_widgets(self):
@@ -111,8 +113,6 @@ class PoS():
         self.payment_button = tk.Button(right_frame, text="Pagar", command=self.payment)
         self.payment_button.grid(row=10, column=0, padx=10, pady=2)
 
-        self.close_button = tk.Button(right_frame, text="Salir", command=self.exit)
-        self.close_button.grid(row=11, column=0, padx=10, pady=50)
 
     #   Actualizar Tiempo
     def update_time(self):
@@ -261,18 +261,25 @@ class PoS():
         self.scan_entry.focus_set()
         self.message_label.config(text="Carrito vacío", fg="black")
 
-    #   Cierra el programa
-    def exit(self):
-
         self.root.destroy()
         #FormMainDesign().mostrar_ventana()
   
     #   Ajusta pantalla completa
-    def toggle_fullscreen(self, event=None):
-        self.state = not self.state
-        self.root.attributes("-fullscreen", self.state)
+  #  def toggle_fullscreen(self, event=None):
+  #      self.state = not self.state
+  #      self.root.attributes("-fullscreen", self.state)
   
     #   Quita pantalla completa
-    def quit_fullscreen(self, event=None):
-        self.state = False
-        self.root.attributes("-fullscreen", self.state)
+ #   def quit_fullscreen(self, event=None):
+  #      self.state = False
+  #      self.root.attributes("-fullscreen", self.state)
+
+    def ocultar(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.visible = False
+    
+    def mostrar(self):
+        for widget in self.root.winfo_children():
+            widget.place()
+        self.visible = True
