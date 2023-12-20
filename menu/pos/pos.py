@@ -15,15 +15,6 @@ class PoS():
         self.root = root
         self.visible = False
 
-        #self.root.title("VivaControl - Punto de Venta")
-        #self.root.geometry("1280x400")
-
-        #self.state = False
-        #root.attributes("-fullscreen", self.state)  # Configura el modo de pantalla completa
-
-        #root.bind("<F11>", self.toggle_fullscreen)  # Atajo de teclado para alternar la pantalla completa
-        #root.bind("<Escape>", self.quit_fullscreen)  # Atajo de teclado para salir de pantalla completa
-
         self.current_cart = {}
         self.locals = locals
         self.previous_local = []
@@ -264,15 +255,6 @@ class PoS():
         self.root.destroy()
         #FormMainDesign().mostrar_ventana()
   
-    #   Ajusta pantalla completa
-  #  def toggle_fullscreen(self, event=None):
-  #      self.state = not self.state
-  #      self.root.attributes("-fullscreen", self.state)
-  
-    #   Quita pantalla completa
- #   def quit_fullscreen(self, event=None):
-  #      self.state = False
-  #      self.root.attributes("-fullscreen", self.state)
 
     def ocultar(self):
         for widget in self.root.winfo_children():

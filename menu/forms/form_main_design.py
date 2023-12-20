@@ -24,6 +24,13 @@ class FormMainDesign(tk.Tk):
         self.ventanas_secundarias = {}
         self.submenu_actual = None
 
+        self.state = False
+        super().attributes("-fullscreen", self.state)  # Configura el modo de pantalla completa
+
+        super().bind("<F11>", self.toggle_fullscreen)  # Atajo de teclado para alternar la pantalla completa
+        super().bind("<Escape>", self.quit_fullscreen)  # Atajo de teclado para salir de pantalla completa
+
+
     def config_window(self):
         #Configuracion de la ventana inicial
         self.title("VivaControl - Bienvenido")
@@ -140,9 +147,17 @@ class FormMainDesign(tk.Tk):
         # Actualizar el submenu actual
         self.submenu_actual = nombre_clase
 
-
     def cerrar_ventana_secundaria(self):
         if self.submenu_actual in self.ventanas_secundarias:
             self.ventanas_secundarias[self.submenu_actual].ocultar()
             self.submenu_actual = None
 
+    #   Ajusta pantalla completa
+    def toggle_fullscreen(self, event=None):
+        self.state = not self.state
+        super().attributes("-fullscreen", self.state)
+  
+    #   Quita pantalla completa
+    def quit_fullscreen(self, event=None):
+        self.state = False
+        super().attributes("-fullscreen", self.state)
