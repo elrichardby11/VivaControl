@@ -1,5 +1,5 @@
 import tkinter as tk
-import useful.useful_window as util_ventana
+import menu.useful.useful_window as util_ventana
 
 class FormInfoDesign(tk.Toplevel):
 

@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import font
 import subprocess
-from config import color_barra_superior, color_cuerpo_principal, color_menu_cursor_encima, color_menu_lateral
-import useful.useful_assets as util_img
-import useful.useful_window as util_ventana
-from forms.form_info_design import FormInfoDesign
-from aux.aux import Auxiliares
-from pos.pos import PoS
+from menu.config import color_barra_superior, color_cuerpo_principal, color_menu_cursor_encima, color_menu_lateral
+from menu.useful import useful_assets as util_img
+from menu.useful import useful_window as util_ventana
+from menu.forms.form_info_design import FormInfoDesign
+from menu.aux.aux import Auxiliares
+from menu.pos.pos import PoS
 import time
 
 class FormMainDesign(tk.Tk):
@@ -30,7 +30,6 @@ class FormMainDesign(tk.Tk):
 
         super().bind("<F11>", self.toggle_fullscreen)  # Atajo de teclado para alternar la pantalla completa
         super().bind("<Escape>", self.quit_fullscreen)  # Atajo de teclado para salir de pantalla completa
-
 
     def config_window(self):
 

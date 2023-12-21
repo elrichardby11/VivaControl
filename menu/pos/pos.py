@@ -4,10 +4,10 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from datetime import datetime 
-from pos.file_operations import save_to_file
-from pos.products import search_products
-from pos.locals import locals
-from config import color_cuerpo_principal
+from menu.pos.file_operations import save_to_file
+from menu.pos.products import search_products
+from menu.pos.locals import locals
+from menu.config import color_cuerpo_principal
 
 
 class PoS():
@@ -41,7 +41,8 @@ class PoS():
         self.add_to_cart_button = tk.Button(self.root, text="Agregar al carrito", command=self.add_to_cart)
         self.add_to_cart_button.place(relx=0.5, rely=0.07)
 
-        self.message_label = tk.Label(self.root, text="Escanee un producto ", fg="black", bg=color_cuerpo_principal)
+        self.message_label = tk.Label(self.root, text="", fg="black", bg=color_cuerpo_principal)
+        self.message_label.config(text="Escanee un producto ", fg="black")
         self.message_label.place(relx=0.4, rely=0.15, anchor="center")
         
         self.cart_label = tk.Label(self.root, text="Carrito: ", bg=color_cuerpo_principal)
@@ -245,7 +246,6 @@ class PoS():
         self.root.destroy()
         #FormMainDesign().mostrar_ventana()
   
-
     def ocultar(self):
         for widget in self.root.winfo_children():
             widget.destroy()

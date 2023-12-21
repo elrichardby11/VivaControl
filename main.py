@@ -2,6 +2,7 @@ import tkinter
 import customtkinter
 from PIL import ImageTk, Image
 import subprocess
+from menu.forms import form_main_design as form
 
 class Login:
 
@@ -59,18 +60,23 @@ class Login:
 
     def button_function(self, event=None):
 
+        #for widget in self.root.winfo_children():
+        #    widget.destroy()
         self.root.destroy()  # destroy current window
-        main_pos = '../01.CODE/menu/main.py'
-        try:
-            subprocess.run(["python3", main_pos], check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"Error al ejecutar {main_pos}: {e}")
+        app = form.FormMainDesign()
+        app.mainloop()  # Solo usa mainloop en la ventana principal
+    
+        #main_pos = '../01.CODE/menu/main.py'
+        #try:
+        #    subprocess.run(["python3", main_pos], check=True)
+        #except subprocess.CalledProcessError as e:
+        #    print(f"Error al ejecutar {main_pos}: {e}")
 
-    def registrar_usuario(self, event=None):
-        self.nombre = self.nombre_de_usuario.get()
-        self.password = self.contrasena.get()
-        with open('../01.CODE/usuarios.txt', 'a') as archivo:
-            archivo.write(f"{self.nombre},{self.password}\n")
+#    def registrar_usuario(self, event=None):
+#        self.nombre = self.nombre_de_usuario.get()
+#        self.password = self.contrasena.get()
+#        with open('../01.CODE/usuarios.txt', 'a') as archivo:
+#            archivo.write(f"{self.nombre},{self.password}\n")
 
     def verificar_credenciales(self, event=None):
         nombre_de_usuario = self.nombre_de_usuario.get()

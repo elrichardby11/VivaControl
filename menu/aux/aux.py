@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox, simpledialog, scrolledtext as st
 from tkinter import *
 from datetime import datetime
 import cx_Oracle
-from config import color_cuerpo_principal
+from menu.config import color_cuerpo_principal
 
 class Auxiliares():
     
