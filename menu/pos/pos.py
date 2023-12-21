@@ -7,6 +7,8 @@ from datetime import datetime
 from pos.file_operations import save_to_file
 from pos.products import search_products
 from pos.locals import locals
+from config import color_cuerpo_principal
+
 
 class PoS():
 
@@ -24,33 +26,29 @@ class PoS():
     #   Crea los botones, textos, etc
     def create_widgets(self):
 
-        # Izquierda
-        left_frame = tk.Frame(self.root)
-        left_frame.grid(row=0, column=0, padx=10, pady=30, sticky="nsew")
+        self.time_label = tk.Label(self.root, text="", bg=color_cuerpo_principal)
+        self.time_label.place(relx=0.5, rely=0.02, anchor="center")
 
-        self.time_label = tk.Label(left_frame, text="")
-        self.time_label.grid(row=0, column=0)
+        self.scan_label = tk.Label(self.root, text="Escanea el código del producto:", bg=color_cuerpo_principal)
+        self.scan_label.place(relx=0.4, rely=0.07, anchor="center")
 
-        self.scan_label = tk.Label(left_frame, text="Escanea el código del producto:")
-        self.scan_label.grid(row=1, column=0, padx=10, pady=5)
-
-        self.scan_entry = tk.Entry(left_frame)
-        self.scan_entry.grid(row=2, column=0, padx=10, pady=0)
+        self.scan_entry = tk.Entry(self.root)
+        self.scan_entry.place(relx=0.4, rely=0.1, anchor="center")
         self.scan_entry.focus_set()
 
         self.scan_entry.bind('<Return>', self.add_to_cart)
 
-        self.add_to_cart_button = tk.Button(left_frame, text="Agregar al carrito", command=self.add_to_cart)
-        self.add_to_cart_button.grid(row=3, column=0, padx=10, pady=5)
+        self.add_to_cart_button = tk.Button(self.root, text="Agregar al carrito", command=self.add_to_cart)
+        self.add_to_cart_button.place(relx=0.5, rely=0.07)
 
-        self.message_label = tk.Label(left_frame, text="Escanee un producto ", fg="black")
-        self.message_label.grid(row=4, column=0, padx=10, pady=5)
+        self.message_label = tk.Label(self.root, text="Escanee un producto ", fg="black", bg=color_cuerpo_principal)
+        self.message_label.place(relx=0.4, rely=0.15, anchor="center")
+        
+        self.cart_label = tk.Label(self.root, text="Carrito: ", bg=color_cuerpo_principal)
+        self.cart_label.place(relx=0.4, rely=0.2, anchor="center")
 
-        self.cart_label = tk.Label(left_frame, text="Carrito: ")
-        self.cart_label.grid(row=5, column=0, padx=10, pady=5)
-
-        self.tree = ttk.Treeview(left_frame, height=0, columns=("col2", "col3", "col4"))
-        self.tree.grid(row=6, column=0, padx=10, pady=0)
+        self.tree = ttk.Treeview(self.root, height=0, columns=("col2", "col3", "col4"))
+        self.tree.place(relx=0.015, rely=0.225)
         self.tree.heading("#0", text="Código", anchor=tk.CENTER)
         self.tree.heading("col2", text="Nombre", anchor=tk.CENTER)
         self.tree.heading("col3", text="Cantidad", anchor=tk.CENTER)
@@ -59,51 +57,43 @@ class PoS():
         self.tree.column("col2", width=262)
         self.tree.column("col3", width=262)
         self.tree.column("col4", width=262)
+        
+        self.cart_listbox = tk.Listbox(self.root, borderwidth=2, relief="ridge", height=25, width=130)
+        self.cart_listbox.place(relx=0.015, rely=0.25)
 
-        self.cart_listbox = tk.Listbox(left_frame, borderwidth=2, relief="ridge", height=25, width=130)
-        self.cart_listbox.grid(row=7, column=0, padx=10, pady=0)
+        self.subtotal_label = tk.Label(self.root, text="Total:    $    0", bg=color_cuerpo_principal)
+        self.subtotal_label.place(relx=0.4, rely=0.95, anchor="center")
+        
+        self.local_label = tk.Label(self.root, text="Selecciona la sucursal:", bg=color_cuerpo_principal)
+        self.local_label.place(relx=0.9, rely=0.07, anchor="center")
 
-        self.subtotal_label = tk.Label(left_frame, text="Total:    $    0")
-        self.subtotal_label.grid(row=8, column=0, padx=10, pady=5)
-
-        # Derecha
-        right_frame = tk.Frame(self.root)
-        right_frame.grid(row=0, column=1, padx=10, pady=250, sticky="nsew")
-
-        self.local_label = tk.Label(right_frame, text="Selecciona la sucursal:")
-        self.local_label.grid(row=0, column=0, padx=5)
-
-        self.local_options = ttk.Combobox(right_frame, values=locals, state="readonly")
+        self.local_options = ttk.Combobox(self.root, values=locals, state="readonly")
         self.local_options.bind("<FocusOut>", self.add_local_history)
         self.local_options.bind("<<ComboboxSelected>>", self.handle_local_selection)
-        self.local_options.grid(row=2, column=0, padx=5)
+        self.local_options.place(relx=0.9, rely=0.1, anchor="center")
 
-        self.label = tk.Label(right_frame, text="")
-        self.label.grid(row=3, column=0, pady=30)
+        self.payment_label = tk.Label(self.root, text="Selecciona el método de pago:", bg=color_cuerpo_principal)
+        self.payment_label.place(relx=0.9, rely=0.4, anchor="center")
 
-        self.payment_label = tk.Label(right_frame, text="Selecciona el método de pago:")
-        self.payment_label.grid(row=4, column=0, padx=5)
-
-        self.payment_options = ttk.Combobox(right_frame, values=['Efectivo', 'Débito', 'Crédito'], state="readonly")
+        self.payment_options = ttk.Combobox(self.root, values=['Efectivo', 'Débito', 'Crédito'], state="readonly")
         self.payment_options.bind("<<ComboboxSelected>>", self.handle_payment_selection)
-        self.payment_options.grid(row=5, column=0, padx=10, pady=5)
+        self.payment_options.place(relx=0.9, rely=0.43, anchor="center")
 
-        self.message_label2 = tk.Label(right_frame, text="Monto en Efectivo: ", fg="black")
-        self.message_label2.grid(row=6, column=0, padx=10, pady=5)
+        self.message_label2 = tk.Label(self.root, text="Monto en Efectivo: ", fg="black", bg=color_cuerpo_principal)
+        self.message_label2.place(relx=0.9, rely=0.5, anchor="center")
 
-        self.scan_entry2 = tk.Entry(right_frame, state="disabled")
-        self.scan_entry2.grid(row=7, column=0, padx=10, pady=5)
+        self.scan_entry2 = tk.Entry(self.root, state="disabled")
+        self.scan_entry2.place(relx=0.9, rely=0.53, anchor="center")
         self.scan_entry2.bind('<Return>', self.payment)
 
-        self.edit_button = tk.Button(right_frame, text="Editar", command=self.edit_quantity)
-        self.edit_button.grid(row=8, column=0, padx=10, pady=2)
+        self.edit_button = tk.Button(self.root, text="Editar", command=self.edit_quantity)
+        self.edit_button.place(relx=0.9, rely=0.6, anchor="center")
 
-        self.remove_button = tk.Button(right_frame, text="Eliminar", command=self.remove_product)
-        self.remove_button.grid(row=9, column=0, padx=10, pady=2)
+        self.remove_button = tk.Button(self.root, text="Eliminar", command=self.remove_product)
+        self.remove_button.place(relx=0.9, rely=0.65, anchor="center")
 
-        self.payment_button = tk.Button(right_frame, text="Pagar", command=self.payment)
-        self.payment_button.grid(row=10, column=0, padx=10, pady=2)
-
+        self.payment_button = tk.Button(self.root, text="Pagar", command=self.payment)
+        self.payment_button.place(relx=0.9, rely=0.7, anchor="center")
 
     #   Actualizar Tiempo
     def update_time(self):

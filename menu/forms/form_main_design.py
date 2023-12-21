@@ -14,7 +14,7 @@ class FormMainDesign(tk.Tk):
     def __init__(self):
         super().__init__()
         #self.logo = util_img.leer_imagen("/home/richard/Documentos/VivaControl/01.CODE/assets/VivaControl.png", (560, 136))
-        self.perfil = util_img.leer_imagen("/home/richard/Documentos/VivaControl/01.CODE/assets/Profile.png", (100,100))
+        self.perfil = util_img.leer_imagen("../01.CODE/assets/Profile.png", (100,100))
         self.config_window()
         self.panels()
         self.top_bar_controls()
@@ -24,14 +24,16 @@ class FormMainDesign(tk.Tk):
         self.ventanas_secundarias = {}
         self.submenu_actual = None
 
+        # Configura el modo de pantalla completa
         self.state = False
-        super().attributes("-fullscreen", self.state)  # Configura el modo de pantalla completa
+        super().attributes("-fullscreen", self.state)  
 
         super().bind("<F11>", self.toggle_fullscreen)  # Atajo de teclado para alternar la pantalla completa
         super().bind("<Escape>", self.quit_fullscreen)  # Atajo de teclado para salir de pantalla completa
 
 
     def config_window(self):
+
         #Configuracion de la ventana inicial
         self.title("VivaControl - Bienvenido")
         #self.iconbitmap("../01.CODE/assets/VivaControl.png")
@@ -130,13 +132,17 @@ class FormMainDesign(tk.Tk):
         FormInfoDesign()
    
     def abrir_ventana_secundaria(self, clase_ventana):
+
+        # Obtener nombre de Clase
         nombre_clase = clase_ventana.__name__
 
+        # Si hay algo en el menú y es en el menú al cambiar es diferente 
         if self.submenu_actual and self.submenu_actual != nombre_clase:
 
             # Cerrar la ventana secundaria si hay alguna abierta
             self.cerrar_ventana_secundaria()
 
+        # Si no  
         if nombre_clase not in self.ventanas_secundarias or not self.ventanas_secundarias[nombre_clase].visible:
             self.ventanas_secundarias[nombre_clase] = clase_ventana(self.cuerpo_principal)
             self.title(f"VivaControl - {nombre_clase}")

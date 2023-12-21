@@ -8,12 +8,10 @@ from config import color_cuerpo_principal
 class Auxiliares():
     
     def __init__(self, root):
+        
         self.root = root
-        #self.root.title("VivaControl - Auxiliares")
-        #self.root.geometry("1280x720")
         self.visible = False
         self.create_widgets()
-
         self.resultados = {}
     
     #   Crear Widgets
