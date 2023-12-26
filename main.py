@@ -63,7 +63,7 @@ class Login:
     def button_function(self, event=None):
         self.root.destroy()  # destroy current window
         app = form.FormMainDesign()
-        app.mainloop()  # Solo usa mainloop en la ventana principal
+        app.mainloop()
 
     def verificar_credenciales(self, event=None):
         usuario = self.nombre_de_usuario.get()
@@ -79,18 +79,6 @@ class Login:
             else:
                 self.text_var = tk.StringVar(value="Credenciales Incorrectas.")
                 self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
-
-
-  #      nombre_de_usuario = self.nombre_de_usuario.get()
-  #      contrasena_ingresada = self.contrasena.get()
-  #      with open('../01.CODE/usuarios.txt', 'r') as archivo:
-  #          for linea in archivo:
-  #              usuario, contrasena = linea.strip().split(',')
-  #              if usuario == nombre_de_usuario and contrasena == contrasena_ingresada:
-  #                  self.button_function(self)
-  #              else:
-  #                  self.text_var = tk.StringVar(value="Credenciales Incorrectas.")
-  #                  self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
 
 def main():
     root = tk.Tk()
