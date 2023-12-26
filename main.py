@@ -42,9 +42,6 @@ class Login:
         self.nombre_de_usuario = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Nombre de Usuario')
         self.nombre_de_usuario.place(x=50, y=115)
 
-        #self.nombre_de_usuario.insert(0, "Texto predeterminado")
-        #self.nombre_de_usuario.bind("<FocusOut>", lambda args: self.nombre_de_usuario.delete(0,"end"))
-
         self.contrasena = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Contraseña', show="*")
         self.contrasena.place(x=50, y=170)
 
@@ -59,18 +56,9 @@ class Login:
         self.button1.place(x=50, y=245)
 
     def button_function(self, event=None):
-
-        #for widget in self.root.winfo_children():
-        #    widget.destroy()
         self.root.destroy()  # destroy current window
         app = form.FormMainDesign()
         app.mainloop()  # Solo usa mainloop en la ventana principal
-    
-        #main_pos = '../01.CODE/menu/main.py'
-        #try:
-        #    subprocess.run(["python3", main_pos], check=True)
-        #except subprocess.CalledProcessError as e:
-        #    print(f"Error al ejecutar {main_pos}: {e}")
 
 #    def registrar_usuario(self, event=None):
 #        self.nombre = self.nombre_de_usuario.get()
@@ -91,7 +79,6 @@ class Login:
                     self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
 
 def main():
-    # You can easily integrate authentication system
     root = tkinter.Tk()
     login = Login(root)
     root.mainloop()
