@@ -1,7 +1,9 @@
-import tkinter
+import tkinter as tk
 import customtkinter
 from PIL import ImageTk, Image
-import subprocess
+from dotenv import load_dotenv
+import os
+import ast
 from menu.forms import form_main_design as form
 
 class Login:
@@ -12,6 +14,9 @@ class Login:
         customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
         self.root.geometry("600x440")
         self.root.title('VivaControl - Login')
+
+        load_dotenv() # Load user and passwords
+
         self.widgets()
 
     def widgets(self):
@@ -21,12 +26,12 @@ class Login:
 
         # Creating custom frame
         self.frame = customtkinter.CTkFrame(master=self.l1, width=320, height=330, corner_radius=15)
-        self.frame.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+        self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
         self.l2 = customtkinter.CTkLabel(master=self.frame, text="Inicio Sesión", font=('Century Gothic', 20))
         self.l2.place(x=105, y=45)
 
-        text_var = tkinter.StringVar(value="")
+        text_var = tk.StringVar(value="")
         
         self.label2 = customtkinter.CTkLabel(master=self.frame,
                                     textvariable=text_var,
@@ -37,7 +42,7 @@ class Login:
                                     fg_color="transparent",
                                     #fg_color=("#ffa372", "gray75"),
                                     corner_radius=5)
-        self.label2.place(x=160, y=90, anchor=tkinter.CENTER)
+        self.label2.place(x=160, y=90, anchor=tk.CENTER)
 
         self.nombre_de_usuario = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Nombre de Usuario')
         self.nombre_de_usuario.place(x=50, y=115)
@@ -60,26 +65,35 @@ class Login:
         app = form.FormMainDesign()
         app.mainloop()  # Solo usa mainloop en la ventana principal
 
-#    def registrar_usuario(self, event=None):
-#        self.nombre = self.nombre_de_usuario.get()
-#        self.password = self.contrasena.get()
-#        with open('../01.CODE/usuarios.txt', 'a') as archivo:
-#            archivo.write(f"{self.nombre},{self.password}\n")
-
     def verificar_credenciales(self, event=None):
-        nombre_de_usuario = self.nombre_de_usuario.get()
-        contrasena_ingresada = self.contrasena.get()
-        with open('../01.CODE/usuarios.txt', 'r') as archivo:
-            for linea in archivo:
-                usuario, contrasena = linea.strip().split(',')
-                if usuario == nombre_de_usuario and contrasena == contrasena_ingresada:
-                    self.button_function(self)
-                else:
-                    self.text_var = tkinter.StringVar(value="Credenciales Incorrectas.")
-                    self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
+        usuario = self.nombre_de_usuario.get()
+        contrasena = self.contrasena.get()
+
+        users_and_passwords_str = os.environ.get("USERS_AND_PASSWORDS", "")
+        users_and_passwords = ast.literal_eval(users_and_passwords_str)
+
+
+        for user, password in users_and_passwords:
+            if user == usuario and password == contrasena:
+                self.button_function(self)
+            else:
+                self.text_var = tk.StringVar(value="Credenciales Incorrectas.")
+                self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
+
+
+  #      nombre_de_usuario = self.nombre_de_usuario.get()
+  #      contrasena_ingresada = self.contrasena.get()
+  #      with open('../01.CODE/usuarios.txt', 'r') as archivo:
+  #          for linea in archivo:
+  #              usuario, contrasena = linea.strip().split(',')
+  #              if usuario == nombre_de_usuario and contrasena == contrasena_ingresada:
+  #                  self.button_function(self)
+  #              else:
+  #                  self.text_var = tk.StringVar(value="Credenciales Incorrectas.")
+  #                  self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
 
 def main():
-    root = tkinter.Tk()
+    root = tk.Tk()
     login = Login(root)
     root.mainloop()
     
