@@ -5,8 +5,8 @@ from menu.config import color_barra_superior, color_cuerpo_principal, color_menu
 from menu.useful import useful_assets as util_img
 from menu.useful import useful_window as util_ventana
 from menu.forms.form_info_design import FormInfoDesign
-from menu.aux.aux import Auxiliares
-from menu.pos.pos import PoS
+from menu.apps.aux.aux import Auxiliares
+from menu.apps.pos.pos import PoS
 import time
 
 class FormMainDesign(tk.Tk):

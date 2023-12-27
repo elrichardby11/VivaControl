@@ -4,9 +4,9 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from datetime import datetime 
-from menu.pos.file_operations import save_to_file
-from menu.pos.products import search_products
-from menu.pos.locals import locals
+from menu.apps.pos.file_operations import save_to_file
+from menu.apps.pos.products import search_products
+from menu.apps.pos.locals import locals
 from menu.config import color_cuerpo_principal
 
 
