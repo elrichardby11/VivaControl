@@ -4,16 +4,20 @@ from tkinter import *
 from datetime import datetime
 import cx_Oracle
 from menu.config import color_cuerpo_principal
+from dotenv import load_dotenv
+import os
 
 class Auxiliares():
     
     def __init__(self, root):
-        
+        super().__init__()
         self.root = root
         self.visible = False
         self.create_widgets()
         self.resultados = {}
-    
+
+        load_dotenv() # Load database
+
     #   Crear Widgets
     def create_widgets(self):
 
@@ -99,98 +103,63 @@ class Auxiliares():
         
     #   Actualizar Tiempo
     def update_time(self):
-        current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-        self.time_label.config(text=f"Fecha actual: {current_time}")
-        self.root.after(1000, self.update_time)
+        try:
+            current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+            self.time_label.config(text=f"Fecha actual: {current_time}")
+            self.root.after(1000, self.update_time)
+        except tk.TclError as e:
+            print("error tlc {e}")
 
     #   Buscar Auxiliar
     def search(self, event=None):
         search_method = self.type_options.get()
+
         if search_method == "Razon Social":
-            consulta = (self.scan_entry.get().upper())
-            consulta_con_comodines = f'%{consulta}%'
-            self.clear_list()
-                
-            # Conectar a la base de datos Oracle
-            connection = cx_Oracle.connect("VivaControl/T$g#kP2LMv8X@XE")
+            search_method = "RAZON_SOCIAL"
 
-            # Crear un cursor
-            cursor = connection.cursor()
+        elif search_method == "Rut":
+            search_method = "RUT_AUXILIAR"
 
-            # Ejecutar la consulta SQL
-            cursor.execute("SELECT RUT_AUXILIAR,DV,RAZON_SOCIAL,DIRECCION, TELEFONO FROM AUXILIAR WHERE RAZON_SOCIAL LIKE :con", con = consulta_con_comodines)
-            # Obtener los resultados de la consulta
-            results = cursor.fetchall()
+        consulta = (self.scan_entry.get().upper())
+        consulta_con_comodines = f'%{consulta}%'
+        self.clear_list()
+        
+        # Conectar a la base de datos Oracle
+        con = cx_Oracle.connect(f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE")
 
-            if results != []:
-                self.resultados = {}
-                for row in results:
+        # Crear un cursor
+        cursor = con.cursor()
 
-                    rut, dv, name, address, phone_number = row
+        # Ejecutar la consulta SQL
+        cursor.execute(f"SELECT RUT_AUXILIAR, DV, RAZON_SOCIAL, DIRECCION, TELEFONO FROM AUXILIAR WHERE {search_method} LIKE :con", con = consulta_con_comodines)
+        # Obtener los resultados de la consulta
+        results = cursor.fetchall()
 
-                    # Replace None values with "-"
-                    name = name if name is not None else "-"
-                    address = address if address is not None else "-"
-                    phone_number = phone_number if phone_number is not None else "-"
+        if results != []:
+            self.resultados = {}
+            for row in results:
 
-                    self.resultados[rut] = {"dv": dv, "name": name, "address" : address, "phone_number" : phone_number}
-                    self.update_list()
+                rut, dv, name, address, phone_number = row
 
-                    self.list_aux.insert(tk.END, row)
-                self.error_label.config(fg="green", text="Mostrando resultados")
-                
-            else:
-                self.error_label.config(fg="red", text="Sin resultados")
+                # Replace None values with "-"
+                name = name if name is not None else "-"
+                address = address if address is not None else "-"
+                phone_number = phone_number if phone_number is not None else "-"
 
-            # Cerrar la conexión
-            connection.close()
+                self.resultados[rut] = {"dv": dv, "name": name, "address" : address, "phone_number" : phone_number}
+                self.update_list()
 
-
-        elif search_method == "Rut":                
-            consulta = (self.scan_entry.get())
-            consulta_con_comodines = f'{(consulta)}%'
-            self.clear_list()
+                self.list_aux.insert(tk.END, row)
+            self.error_label.config(fg="green", text="Mostrando resultados")
             
-            # Conectar a la base de datos Oracle
-            connection = cx_Oracle.connect("VivaControl/T$g#kP2LMv8X@XE")
-
-            # Crear un cursor
-            cursor = connection.cursor()
-
-            # Ejecutar la consulta SQL
-            cursor.execute("SELECT RUT_AUXILIAR,DV,RAZON_SOCIAL,DIRECCION, TELEFONO FROM AUXILIAR WHERE RUT_AUXILIAR LIKE :con", con = consulta_con_comodines)
-            # Obtener los resultados de la consulta
-            results = cursor.fetchall()
-
-
-            if results != []:
-                self.resultados = {}
-                for row in results:
-                    rut, dv, name, address, phone_number = row
-
-                    # Replace None values with "-"
-                    name = name if name is not None else "-"
-                    address = address if address is not None else "-"
-                    phone_number = phone_number if phone_number is not None else "-"
-
-                    self.resultados[rut] = {"dv": dv, "name": name, "address" : address, "phone_number" : phone_number}
-                    self.update_list()
-
-                    # self.list_aux.insert(tk.END,f"{rut:>35}-{dv:<40} {name:^50}")
-
-                self.error_label.config(fg="green", text="Mostrando resultados")
-
-            else:
-                self.error_label.config(fg="red", text="Sin resultados")
-
-            # Cerrar la conexión
-            connection.close()
-
         else:
-            self.error_label.config(fg="red", text="Por favor, seleccione un metodo de busqueda")
+            self.error_label.config(fg="red", text="Sin resultados")
+
+        # Cerrar la conexión
+        con.close()
 
     #   Actualizar Lista
-    def update_list(self):        
+    def update_list(self):
         self.clear_list()
 
         self.list_aux.configure(state=tk.NORMAL)
@@ -229,4 +198,3 @@ class Auxiliares():
         for widget in self.root.winfo_children():
             widget.place()
         self.visible = True
-

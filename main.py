@@ -4,12 +4,13 @@ from PIL import ImageTk, Image
 from dotenv import load_dotenv
 import os
 import ast
-from menu.forms import form_main_design as form
+import menu.forms.form_main_design as form
 import menu.useful.useful_window as util_ventana
 
 class Login:
 
     def __init__(self, root):
+        super().__init__()
         self.root = root
 
         customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
@@ -64,11 +65,6 @@ class Login:
         self.button1 = customtkinter.CTkButton(master=self.frame, width=220, text="Iniciar Sesión", command= self.verificar_credenciales, corner_radius=6)
         self.button1.place(x=50, y=245)
 
-    def button_function(self, event=None):
-        self.root.destroy()  # destroy current window
-        app = form.FormMainDesign()
-        app.mainloop()
-
     def verificar_credenciales(self, event=None):
         usuario = self.nombre_de_usuario.get()
         contrasena = self.contrasena.get()
@@ -83,6 +79,11 @@ class Login:
         else:
             self.text_var.set("Credenciales Incorrectas.")
             self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
+
+    def button_function(self, event=None):
+        self.root.destroy()  # destroy current window
+        self.app = form.FormMainDesign()
+        self.app.mainloop()
 
 def main():
     root = tk.Tk()

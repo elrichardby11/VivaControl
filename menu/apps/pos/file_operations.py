@@ -1,11 +1,14 @@
 from datetime import datetime
 import cx_Oracle
-
+from dotenv import load_dotenv
+import os
 
 def save_to_file(self,current_cart, total_amount, payment_method, payment_quantity, local):
 
+    load_dotenv() # Load database
+
     # Conectar a la base de datos Oracle
-    con = cx_Oracle.connect("VivaControl/T$g#kP2LMv8X@XE")
+    con = cx_Oracle.connect(f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE")
 
     # Crear un cursor
     cursor = con.cursor()

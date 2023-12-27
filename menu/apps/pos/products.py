@@ -1,16 +1,20 @@
 import cx_Oracle
+from dotenv import load_dotenv
+import os
 
 def search_products(*args):
+
+    load_dotenv() # Load database
 
     if args is not None:
         args = str(args)
         args = args.replace(args, args[2])
 
     # Conectar a la base de datos Oracle
-    connection = cx_Oracle.connect("VivaControl/T$g#kP2LMv8X@XE")
+    con = cx_Oracle.connect(f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE")
 
     # Crear un cursor
-    cursor = connection.cursor()
+    cursor = con.cursor()
 
     # Ejecutar la consulta SQL
     cursor.execute(f"SELECT ID_PRODUCTO, NOMBRE, PRECIO FROM PRODUCTO JOIN SUCURSAL_PRODUCTO ON SUCURSAL_PRODUCTO.ID_PROD = PRODUCTO.ID_PRODUCTO WHERE ID_SUCURSAL = {args}")
@@ -18,7 +22,7 @@ def search_products(*args):
     results = cursor.fetchall()
 
     # Cerrar la conexión
-    connection.close()
+    con.close()
 
     # Crear un diccionario para almacenar los datos
     products = {}

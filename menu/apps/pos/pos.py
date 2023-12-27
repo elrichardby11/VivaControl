@@ -14,6 +14,7 @@ class PoS():
 
     #   Configuracion de ventana
     def __init__(self, root):
+        super().__init__()
         self.root = root
         self.visible = False
 

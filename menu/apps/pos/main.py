@@ -6,7 +6,7 @@ def main():
         
     root = tk.Tk()
     app = PoS(root)
-    app.update_time()  # Iniciar la actualización del tiempo
+    #app.update_time()  # Iniciar la actualización del tiempo
     root.mainloop()
 
 

@@ -1,9 +1,13 @@
 import cx_Oracle
+from dotenv import load_dotenv
+import os
 
-connection = cx_Oracle.connect("VivaControl/T$g#kP2LMv8X@XE")
+load_dotenv() # Load database
+
+con = cx_Oracle.connect(f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE")
 
 # Crear un cursor
-cursor = connection.cursor()
+cursor = con.cursor()
 
 # Ejecutar la consulta SQL
 cursor.execute("SELECT ID_SUCURSAL, DIRECCION FROM SUCURSAL")
@@ -11,7 +15,7 @@ cursor.execute("SELECT ID_SUCURSAL, DIRECCION FROM SUCURSAL")
 results = cursor.fetchall()
 
 # Cerrar la conexión
-connection.close()
+con.close()
 
 # Crear una lista para almacenar los datos
 locals = []
