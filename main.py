@@ -5,22 +5,24 @@ from dotenv import load_dotenv
 import os
 import ast
 from menu.forms import form_main_design as form
+import menu.useful.useful_window as util_ventana
 
 class Login:
 
     def __init__(self, root):
         self.root = root
+
         customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
         customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
-        self.root.geometry("600x440")
+ 
         self.root.title('VivaControl - Login')
+        util_ventana.centrar_ventana(self.root, 600, 440)
 
         load_dotenv() # Load user and passwords
 
         self.widgets()
 
     def widgets(self):
-
         self.img1 = Image.open("./assets/pattern.png")
         self.photo = ImageTk.PhotoImage(self.img1)
         self.l1 = tk.Label(master=self.root, image=self.photo)
