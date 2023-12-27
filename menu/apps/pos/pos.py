@@ -113,17 +113,38 @@ class PoS():
     def add_to_cart(self, event=None):
         product_code = self.scan_entry.get()
         selected_local = self.local_options.get()
+
+        # Verificar si selecciono local
         if (selected_local) != "":
             self.products = search_products(selected_local[0])
+            
+            # Verificar si está el codigo en el diccionario de productos
             if product_code in self.products:
-                if product_code in self.current_cart:
-                    self.current_cart[product_code] += 1
-                else:
-                    self.current_cart[product_code] = 1
 
-                self.message_label.config(text=f"Elemento escaneado: {product_code}", fg="green")
-                self.update_subtotal()
-                self.update_cart_listbox()
+                # Verificar si la cantidad del producto sea mayor a 0
+                cantidad = self.products[product_code]['quantity']
+                if cantidad > 0:
+                    
+                    # Verficar si el producto ya ha sido agregado al carrito o no
+                    if product_code in self.current_cart:
+                        if self.current_cart[product_code] >= cantidad:
+                            self.message_label.config(text=f"Producto {product_code} fuera de stock ({cantidad})",fg="red")
+                        else:
+
+                            # Añade el producto al carrito
+                            self.current_cart[product_code] += 1
+                            self.message_label.config(text=f"Elemento escaneado: {product_code}", fg="green")
+                            self.update_subtotal()
+                            self.update_cart_listbox()
+                    else:
+                        # Añade el producto al carrito
+                        self.current_cart[product_code] = 1
+                        self.message_label.config(text=f"Elemento escaneado: {product_code}", fg="green")
+                        self.update_subtotal()
+                        self.update_cart_listbox()
+                else:
+                    self.message_label.config(text=f"Producto {product_code} fuera de stock ({cantidad})",fg="red")
+
             else:
                 self.message_label.config(text=f"Producto no encontrado {product_code}",fg="red")
             # Borra el contenido del campo Entry
@@ -146,12 +167,15 @@ class PoS():
             selected_product = list(self.current_cart.keys())[selected_index[0]]
             new_quantity = tk.simpledialog.askinteger("Editar cantidad", "Editar cantidad de "f"{self.products[selected_product]['name']:}")
             if new_quantity is not None:
-                self.current_cart[selected_product] = new_quantity
-                self.message_label.config(text=f"Elemento editado: {selected_product}", fg="green")
-                self.update_subtotal()
-                self.update_cart_listbox()
+                if (self.products[selected_product]["quantity"] >= new_quantity) and (new_quantity > 0):
+                    self.current_cart[selected_product] = new_quantity
+                    self.message_label.config(text=f"Elemento editado: {selected_product}", fg="green")
+                    self.update_subtotal()
+                    self.update_cart_listbox()
+                else:
+                    self.message_label.config(text=f"Cantidad invalida, stock ({self.products[selected_product]['quantity']}).", fg="red")
             else:
-                pass
+                self.message_label.config(text="Cantidad invalida.", fg="red")
         else:
             self.message_label.config(text="Por favor, selecciona un producto.", fg="red")
 
@@ -243,15 +267,14 @@ class PoS():
         self.scan_entry2.config(state="disabled")
         self.scan_entry.focus_set()
         self.message_label.config(text="Carrito vacío", fg="black")
-
-        self.root.destroy()
-        #FormMainDesign().mostrar_ventana()
   
+    #   Ocultar para Menu
     def ocultar(self):
         for widget in self.root.winfo_children():
             widget.destroy()
         self.visible = False
-    
+
+    #   Mostrar para Menu
     def mostrar(self):
         for widget in self.root.winfo_children():
             widget.place()

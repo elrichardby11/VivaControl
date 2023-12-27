@@ -17,7 +17,7 @@ def search_products(*args):
     cursor = con.cursor()
 
     # Ejecutar la consulta SQL
-    cursor.execute(f"SELECT ID_PRODUCTO, NOMBRE, PRECIO FROM PRODUCTO JOIN SUCURSAL_PRODUCTO ON SUCURSAL_PRODUCTO.ID_PROD = PRODUCTO.ID_PRODUCTO WHERE ID_SUCURSAL = {args}")
+    cursor.execute(f"SELECT ID_PRODUCTO, NOMBRE, PRECIO, CANTIDAD FROM PRODUCTO JOIN SUCURSAL_PRODUCTO ON SUCURSAL_PRODUCTO.ID_PROD = PRODUCTO.ID_PRODUCTO WHERE ID_SUCURSAL = {args}")
     # Obtener los resultados de la consulta
     results = cursor.fetchall()
 
@@ -29,16 +29,17 @@ def search_products(*args):
 
     # Procesar los resultados
     for row in results:
-        id_producto, nombre, precio = row
+        id_producto, nombre, precio, cantidad = row
         
         if id_producto not in products:
         
             # Si el producto no está en el diccionario, lo agrega con su precio de venta actual
-            products[id_producto] = {"name": nombre, "price": precio}
+            products[id_producto] = {"name": nombre, "price": precio, "quantity": cantidad}
         else:
         
-            # Si el producto ya está en el diccionario, actualiza el precio de venta si es más reciente
+            # Si el producto ya está en el diccionario, actualiza el precio de venta si es más reciente y cantidad
             products[id_producto]["price"] = precio
+            products[id_producto]["quantity"] = cantidad
 
     # El diccionario 'products' ahora contiene los datos con el precio de venta más reciente
 
