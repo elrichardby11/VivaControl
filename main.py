@@ -20,8 +20,10 @@ class Login:
         self.widgets()
 
     def widgets(self):
-        self.img1 = ImageTk.PhotoImage(Image.open("./assets/pattern.png"))
-        self.l1 = customtkinter.CTkLabel(master=self.root, image=self.img1)
+
+        self.img1 = Image.open("./assets/pattern.png")
+        self.photo = ImageTk.PhotoImage(self.img1)
+        self.l1 = tk.Label(master=self.root, image=self.photo)
         self.l1.pack()
 
         # Creating custom frame
@@ -31,16 +33,15 @@ class Login:
         self.l2 = customtkinter.CTkLabel(master=self.frame, text="Inicio Sesión", font=('Century Gothic', 20))
         self.l2.place(x=105, y=45)
 
-        text_var = tk.StringVar(value="")
+        self.text_var = tk.StringVar(value="")
         
         self.label2 = customtkinter.CTkLabel(master=self.frame,
-                                    textvariable=text_var,
+                                    textvariable=self.text_var,
                                     font=('Century Gothic', 10),
                                     width=220,
                                     height=25,
                                     text_color="black",
                                     fg_color="transparent",
-                                    #fg_color=("#ffa372", "gray75"),
                                     corner_radius=5)
         self.label2.place(x=160, y=90, anchor=tk.CENTER)
 
@@ -50,7 +51,8 @@ class Login:
         self.contrasena = customtkinter.CTkEntry(master=self.frame, width=220, placeholder_text='Contraseña', show="*")
         self.contrasena.place(x=50, y=170)
 
-        # Evento Pulsar Enters
+        # Events press Enter
+        self.nombre_de_usuario.bind('<Return>', self.verificar_credenciales)
         self.contrasena.bind('<Return>', self.verificar_credenciales)
 
         self.l4 = customtkinter.CTkLabel(master=self.frame, text="Contraseña Olvidada?", font=('Century Gothic', 12))
@@ -71,14 +73,14 @@ class Login:
 
         users_and_passwords_str = os.environ.get("USERS_AND_PASSWORDS", "")
         users_and_passwords = ast.literal_eval(users_and_passwords_str)
+    
+        credentials_correct = any(user == usuario and password == contrasena for user, password in users_and_passwords)
 
-
-        for user, password in users_and_passwords:
-            if user == usuario and password == contrasena:
-                self.button_function(self)
-            else:
-                self.text_var = tk.StringVar(value="Credenciales Incorrectas.")
-                self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
+        if credentials_correct:
+            self.button_function(self)
+        else:
+            self.text_var.set("Credenciales Incorrectas.")
+            self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
 
 def main():
     root = tk.Tk()
