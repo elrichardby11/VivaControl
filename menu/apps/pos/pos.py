@@ -31,7 +31,7 @@ class PoS():
         self.time_label.place(relx=0.5, rely=0.02, anchor="center")
 
         self.scan_label = tk.Label(self.root, text="Escanea el código del producto:", bg=color_cuerpo_principal)
-        self.scan_label.place(relx=0.4, rely=0.07, anchor="center")
+        self.scan_label.place(relx=0.4, rely=0.065, anchor="center")
 
         self.scan_entry = tk.Entry(self.root)
         self.scan_entry.place(relx=0.4, rely=0.1, anchor="center")
@@ -45,27 +45,29 @@ class PoS():
         self.message_label = tk.Label(self.root, text="", fg="black", bg=color_cuerpo_principal)
         self.message_label.config(text="Escanee un producto ", fg="black")
         self.message_label.place(relx=0.4, rely=0.15, anchor="center")
-        
+
         self.cart_label = tk.Label(self.root, text="Carrito: ", bg=color_cuerpo_principal)
         self.cart_label.place(relx=0.4, rely=0.2, anchor="center")
 
-        self.tree = ttk.Treeview(self.root, height=0, columns=("col2", "col3", "col4"))
+        self.tree = ttk.Treeview(self.root, height=0, columns=("col2", "col3", "col4", "col5"))
         self.tree.place(relx=0.015, rely=0.225)
         self.tree.heading("#0", text="Código", anchor=tk.CENTER)
         self.tree.heading("col2", text="Nombre", anchor=tk.CENTER)
-        self.tree.heading("col3", text="Cantidad", anchor=tk.CENTER)
-        self.tree.heading("col4", text="Precio", anchor=tk.CENTER)
-        self.tree.column("#0", width=262)
-        self.tree.column("col2", width=262)
-        self.tree.column("col3", width=262)
-        self.tree.column("col4", width=262)
+        self.tree.heading("col3", text="Precio", anchor=tk.CENTER)
+        self.tree.heading("col4", text="Cantidad", anchor=tk.CENTER)
+        self.tree.heading("col5", text="Total", anchor=tk.CENTER)
+        self.tree.column("#0", width=210)
+        self.tree.column("col2", width=210)
+        self.tree.column("col3", width=209)
+        self.tree.column("col4", width=209)
+        self.tree.column("col5", width=209)
         
-        self.cart_listbox = tk.Listbox(self.root, borderwidth=2, relief="ridge", height=25, width=130)
+        self.cart_listbox = tk.Listbox(self.root, borderwidth=2, relief="ridge", height=25, width=130, font=("Courier New", 10))
         self.cart_listbox.place(relx=0.015, rely=0.25)
 
         self.subtotal_label = tk.Label(self.root, text="Total:    $    0", bg=color_cuerpo_principal)
         self.subtotal_label.place(relx=0.4, rely=0.95, anchor="center")
-        
+
         self.local_label = tk.Label(self.root, text="Selecciona la sucursal:", bg=color_cuerpo_principal)
         self.local_label.place(relx=0.9, rely=0.07, anchor="center")
 
@@ -158,7 +160,9 @@ class PoS():
         for code, quantity in self.current_cart.items():
             product_name = self.products[code]["name"]
             price = self.products[code]["price"]
-            self.cart_listbox.insert(tk.END, f"{code:^50}{product_name:^60}{quantity:^63}{price:^65}")
+            total = price * quantity
+            formatted_text = f"{code:^26}{product_name:^26}{price:^25}{quantity:^27}{total:>16}"    
+            self.cart_listbox.insert(tk.END, formatted_text)
 
     #   Evento editar cantidad
     def edit_quantity(self):

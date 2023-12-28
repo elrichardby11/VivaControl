@@ -28,7 +28,6 @@ def save_to_file(self,current_cart, total_amount, payment_method, payment_quanti
     state = 1       # Estado Activo
     rut = 1         # Rut generico Cliente
 
-
     query = "INSERT INTO MOVIMIENTO (ID_MOVIMIENTO, FECHA, ID_TIPO_MOVIMIENTO, PERIODO, CSTATE_MOVIMIENTO, RUT_AUXILIAR) VALUES (:id, TO_DATE(:fecha, 'dd/mm/yyyy'), :tipo, :periodo, :state, :rut)"
     cursor.execute(query, id=new_id, fecha=fecha, tipo=tipo_mov, periodo=periodo, state=state, rut=rut)
     con.commit()
