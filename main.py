@@ -24,7 +24,7 @@ class Login:
         self.widgets()
 
     def widgets(self):
-        self.img1 = Image.open("./assets/pattern.png")
+        self.img1 = Image.open("../01.CODE/assets/pattern.png")
         self.photo = ImageTk.PhotoImage(self.img1)
         self.l1 = tk.Label(master=self.root, image=self.photo)
         self.l1.pack()

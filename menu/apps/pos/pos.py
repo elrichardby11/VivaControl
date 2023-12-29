@@ -1,14 +1,13 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox, messagebox
 from tkinter import *
-from tkinter import messagebox
-from tkinter import simpledialog
 from datetime import datetime 
 from menu.apps.pos.file_operations import save_to_file
 from menu.apps.pos.products import search_products
 from menu.apps.pos.locals import locals
 from menu.config import color_cuerpo_principal
-
+from playsound import playsound
+ 
 
 class PoS():
 
@@ -64,9 +63,12 @@ class PoS():
         
         self.cart_listbox = tk.Listbox(self.root, borderwidth=2, relief="ridge", height=25, width=130, font=("Courier New", 10))
         self.cart_listbox.place(relx=0.015, rely=0.25)
+        
+        self.subtotal_label_cash = tk.Label(self.root, text="Total Solo Efectivo:    $    0", bg=color_cuerpo_principal)
+        self.subtotal_label_cash.place(relx=0.4, rely=0.915, anchor="center")
 
-        self.subtotal_label = tk.Label(self.root, text="Total:    $    0", bg=color_cuerpo_principal)
-        self.subtotal_label.place(relx=0.4, rely=0.95, anchor="center")
+        self.subtotal_label = tk.Label(self.root, text="Total Tarjetas:    $    0", bg=color_cuerpo_principal)
+        self.subtotal_label.place(relx=0.4, rely=0.965, anchor="center")
 
         self.local_label = tk.Label(self.root, text="Selecciona la sucursal:", bg=color_cuerpo_principal)
         self.local_label.place(relx=0.9, rely=0.07, anchor="center")
@@ -105,11 +107,28 @@ class PoS():
         self.time_label.config(text=f"Fecha actual: {current_time}")
         self.root.after(1000, self.update_time)
 
+    def rounding_law(self, total_amount):
+
+        last_digit = total_amount % 10
+        total_amount_law = total_amount
+        if last_digit <= 5:
+            symbol = "-"
+            total_amount_law -= last_digit
+        else: 
+            last_digit = 10 - last_digit
+            symbol = "+"
+            total_amount_law += last_digit
+        
+        return total_amount_law, symbol, last_digit
+
     #   Actualizar Texto Subtotal
     def update_subtotal(self):
 
         total_amount = sum(self.products[code]["price"] * quantity for code, quantity in self.current_cart.items())
-        self.subtotal_label.config(text=f"Total:{' ' * 186}$ {total_amount}")
+        total_amount_law = self.rounding_law(total_amount)[0]
+
+        self.subtotal_label_cash.config(text=f"Total Solo Efectivo:{' ' * 186}$ {total_amount_law}")
+        self.subtotal_label.config(text=f"Total Tarjetas:{' ' * 194}$ {total_amount}")
 
     #   Evento Añadir al Carrito        
     def add_to_cart(self, event=None):
@@ -136,14 +155,20 @@ class PoS():
                             # Añade el producto al carrito
                             self.current_cart[product_code] += 1
                             self.message_label.config(text=f"Elemento escaneado: {product_code}", fg="green")
+                            file = ("../01.CODE/assets/beep.mp3")
+                            playsound(file)
+
                             self.update_subtotal()
                             self.update_cart_listbox()
                     else:
                         # Añade el producto al carrito
                         self.current_cart[product_code] = 1
                         self.message_label.config(text=f"Elemento escaneado: {product_code}", fg="green")
+                        file = ("../01.CODE/assets/beep.mp3")
+                        playsound(file)
                         self.update_subtotal()
                         self.update_cart_listbox()
+
                 else:
                     self.message_label.config(text=f"Producto {product_code} fuera de stock ({cantidad})",fg="red")
 
@@ -174,6 +199,8 @@ class PoS():
                 if (self.products[selected_product]["quantity"] >= new_quantity) and (new_quantity > 0):
                     self.current_cart[selected_product] = new_quantity
                     self.message_label.config(text=f"Elemento editado: {selected_product}", fg="green")
+                    file = ("../01.CODE/assets/beep.mp3")
+                    playsound(file)
                     self.update_subtotal()
                     self.update_cart_listbox()
                 else:
@@ -242,9 +269,17 @@ class PoS():
                 if (not payment_quantity) or (payment_quantity<total_amount):
                     self.message_label.config(text="Por favor, verifica el monto en efectivo.", fg="red")
                 else:
-                    payment_confirmation = f"Total a pagar: ${total_amount}\nMétodo de pago: {payment_method}\nVuelto: ${payment_quantity-total_amount}"
-                    if tk.messagebox.askyesno("Confirmar Pago", payment_confirmation):
-                        save_to_file(self, self.current_cart, total_amount, payment_method, payment_quantity, local)
+                    total_amount_law, symbol, last_digit = self.rounding_law(total_amount)
+                    payment_confirmation = (
+                        (f"Total: {'$':>24}{total_amount}\n" if last_digit != 0 else "") + 
+                        (f"Ley de redondeo: {symbol:>10}${last_digit}\n" if last_digit != 0 else "") +
+                        f"Total a pagar:{'$':>12}{total_amount_law}\n"
+                        f"Método de pago: {payment_method}\n"
+                        f"Vuelto: {'$':>23}{(payment_quantity - total_amount_law)}"
+                    )
+                    if messagebox.askyesno("Confirmar Pago", payment_confirmation):
+
+                        save_to_file(self, self.current_cart, total_amount, payment_method, payment_quantity, local, last_digit, total_amount_law, symbol)
                         self.clear_cart()
                     else:
                         self.message_label.config(text="Pago no confirmado", fg="red")
@@ -254,8 +289,8 @@ class PoS():
             else:
                 payment_quantity=total_amount
                 payment_confirmation = f"Total a pagar: ${total_amount}\nMétodo de pago: {payment_method}"
-                if tk.messagebox.askyesno("Confirmar Pago", payment_confirmation):
-                    save_to_file(self, self.current_cart, total_amount, payment_method, payment_quantity, local)
+                if messagebox.askyesno("Confirmar Pago", payment_confirmation):
+                    save_to_file(self, self.current_cart, total_amount, payment_method, payment_quantity, local, last_digit=None, total_amount_law=None, symbol=None)
                     self.clear_cart()
                 else:
                     self.message_label.config(text="Pago no confirmado", fg="red")
