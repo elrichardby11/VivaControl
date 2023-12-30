@@ -3,10 +3,16 @@ import cx_Oracle
 from dotenv import load_dotenv
 import os
 
-def insert_data(self,current_cart, total_amount, local, total_amount_law):
+def insert_data(self, cart_info):
 
     load_dotenv() # Load database
+    
+    current_cart = cart_info.get("current_cart", {})
+    total_amount = cart_info.get("total_amount", 0)
+    local = cart_info.get("local", "local")
+    total_amount_law = cart_info.get("total_amount_law", None)
 
+    local = local.replace(local, local[0])
     connection_str = f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE"
     fecha = datetime.now().strftime("%d/%m/%Y")
     periodo = int(datetime.now().strftime("%Y"))

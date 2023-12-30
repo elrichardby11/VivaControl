@@ -132,6 +132,7 @@ class PoS():
 
     #   Evento Añadir al Carrito        
     def add_to_cart(self, event=None):
+        file = ("../01.CODE/assets/beep.mp3")
         product_code = self.scan_entry.get()
         selected_local = self.local_options.get()
 
@@ -155,16 +156,13 @@ class PoS():
                             # Añade el producto al carrito
                             self.current_cart[product_code] += 1
                             self.message_label.config(text=f"Elemento escaneado: {product_code}", fg="green")
-                            file = ("../01.CODE/assets/beep.mp3")
                             playsound(file)
-
                             self.update_subtotal()
                             self.update_cart_listbox()
                     else:
                         # Añade el producto al carrito
                         self.current_cart[product_code] = 1
                         self.message_label.config(text=f"Elemento escaneado: {product_code}", fg="green")
-                        file = ("../01.CODE/assets/beep.mp3")
                         playsound(file)
                         self.update_subtotal()
                         self.update_cart_listbox()
@@ -191,6 +189,7 @@ class PoS():
 
     #   Evento editar cantidad
     def edit_quantity(self):
+        file = ("../01.CODE/assets/beep.mp3")
         selected_index = self.cart_listbox.curselection()
         if selected_index:
             selected_product = list(self.current_cart.keys())[selected_index[0]]
@@ -199,7 +198,6 @@ class PoS():
                 if (self.products[selected_product]["quantity"] >= new_quantity) and (new_quantity > 0):
                     self.current_cart[selected_product] = new_quantity
                     self.message_label.config(text=f"Elemento editado: {selected_product}", fg="green")
-                    file = ("../01.CODE/assets/beep.mp3")
                     playsound(file)
                     self.update_subtotal()
                     self.update_cart_listbox()
@@ -250,7 +248,6 @@ class PoS():
         local = self.local_options.get()
         if local != "":
             local = str(local)
-            local = local.replace(local, local[0])
         else:
             self.message_label.config(text="Por favor, selecciona una sucursal.", fg="red")
 
@@ -278,8 +275,8 @@ class PoS():
                         f"Vuelto: {'$':>23}{(payment_quantity - total_amount_law)}"
                     )
                     if messagebox.askyesno("Confirmar Pago", payment_confirmation):
-
-                        save_to_file(self, self.current_cart, total_amount, payment_method, payment_quantity, local, last_digit, total_amount_law, symbol)
+                        current_cart = self.get_current_cart(self.current_cart, total_amount, payment_method, payment_quantity, local, last_digit, total_amount_law, symbol) 
+                        save_to_file(self, current_cart)
                         self.clear_cart()
                     else:
                         self.message_label.config(text="Pago no confirmado", fg="red")
@@ -290,10 +287,24 @@ class PoS():
                 payment_quantity=total_amount
                 payment_confirmation = f"Total a pagar: ${total_amount}\nMétodo de pago: {payment_method}"
                 if messagebox.askyesno("Confirmar Pago", payment_confirmation):
-                    save_to_file(self, self.current_cart, total_amount, payment_method, payment_quantity, local, last_digit=None, total_amount_law=None, symbol=None)
+                    current_cart = self.get_current_cart(self.current_cart, total_amount, payment_method, payment_quantity, local, last_digit=None, total_amount_law=None, symbol=None) 
+                    save_to_file(self, current_cart)
                     self.clear_cart()
                 else:
                     self.message_label.config(text="Pago no confirmado", fg="red")
+
+    def get_current_cart(self, current_cart_cart, total_amount, payment_method, payment_quantity, local, last_digit, total_amount_law, symbol):
+        current_cart = {
+            "current_cart":current_cart_cart,
+            "total_amount":total_amount,
+            "payment_method":payment_method,
+            "payment_quantity":payment_quantity,
+            "local":local,
+            "last_digit":last_digit,
+            "total_amount_law":total_amount_law,
+            "symbol":symbol
+        }
+        return current_cart
 
     #   Reinicia POS
     def clear_cart(self):
