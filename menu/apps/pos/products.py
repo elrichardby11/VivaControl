@@ -10,19 +10,18 @@ def search_products(*args):
         args = str(args)
         args = args.replace(args, args[2])
 
-    # Conectar a la base de datos Oracle
-    con = cx_Oracle.connect(f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE")
+    connection_str = f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE"
 
-    # Crear un cursor
-    cursor = con.cursor()
+    with cx_Oracle.connect(connection_str) as con:
 
-    # Ejecutar la consulta SQL
-    cursor.execute(f"SELECT ID_PRODUCTO, NOMBRE, PRECIO, CANTIDAD FROM PRODUCTO JOIN SUCURSAL_PRODUCTO ON SUCURSAL_PRODUCTO.ID_PROD = PRODUCTO.ID_PRODUCTO WHERE ID_SUCURSAL = 1")
-    # Obtener los resultados de la consulta
-    results = cursor.fetchall()
+        # Crear un cursor
+        with con.cursor() as cursor:
 
-    # Cerrar la conexión
-    con.close()
+            # Ejecutar la consulta SQL
+            cursor.execute(f"SELECT ID_PRODUCTO, NOMBRE, PRECIO, CANTIDAD FROM PRODUCTO JOIN SUCURSAL_PRODUCTO ON SUCURSAL_PRODUCTO.ID_PROD = PRODUCTO.ID_PRODUCTO WHERE ID_SUCURSAL = 1")
+                    
+            # Obtener los resultados de la consulta
+            results = cursor.fetchall()
 
     # Crear un diccionario para almacenar los datos
     products = {}
