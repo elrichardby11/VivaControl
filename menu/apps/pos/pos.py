@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, messagebox
-from tkinter import *
-from datetime import datetime 
+from datetime import datetime
 from menu.apps.pos.file_operations import save_to_file
 from menu.apps.pos.products import search_products
 from menu.apps.pos.locals import locals

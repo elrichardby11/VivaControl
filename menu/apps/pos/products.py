@@ -17,7 +17,7 @@ def search_products(*args):
     cursor = con.cursor()
 
     # Ejecutar la consulta SQL
-    cursor.execute(f"SELECT ID_PRODUCTO, NOMBRE, PRECIO, CANTIDAD FROM PRODUCTO JOIN SUCURSAL_PRODUCTO ON SUCURSAL_PRODUCTO.ID_PROD = PRODUCTO.ID_PRODUCTO WHERE ID_SUCURSAL = {args}")
+    cursor.execute(f"SELECT ID_PRODUCTO, NOMBRE, PRECIO, CANTIDAD FROM PRODUCTO JOIN SUCURSAL_PRODUCTO ON SUCURSAL_PRODUCTO.ID_PROD = PRODUCTO.ID_PRODUCTO WHERE ID_SUCURSAL = 1")
     # Obtener los resultados de la consulta
     results = cursor.fetchall()
 
