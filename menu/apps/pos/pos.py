@@ -4,6 +4,7 @@ from datetime import datetime
 from menu.apps.pos.file_operations import save_to_file
 from menu.apps.pos.products import search_products
 from menu.apps.pos.locals import locals
+from menu.apps.pos.payments import payments
 from menu.config import color_cuerpo_principal
 from playsound import playsound
  
@@ -80,7 +81,8 @@ class PoS():
         self.payment_label = tk.Label(self.root, text="Selecciona el método de pago:", bg=color_cuerpo_principal)
         self.payment_label.place(relx=0.9, rely=0.4, anchor="center")
 
-        self.payment_options = ttk.Combobox(self.root, values=['Efectivo', 'Débito', 'Crédito'], state="readonly")
+        self.selected_id = None
+        self.payment_options = ttk.Combobox(self.root, values=[value for _, value in payments], state="readonly")
         self.payment_options.bind("<<ComboboxSelected>>", self.handle_payment_selection)
         self.payment_options.place(relx=0.9, rely=0.43, anchor="center")
 
@@ -106,6 +108,7 @@ class PoS():
         self.time_label.config(text=f"Fecha actual: {current_time}")
         self.root.after(1000, self.update_time)
 
+    #   Ley redondeo
     def rounding_law(self, total_amount):
 
         last_digit = total_amount % 10
@@ -221,8 +224,19 @@ class PoS():
 
     #   Configuracion para el campo en Efectivo
     def handle_payment_selection(self, event):
+
         selected_payment_method = self.payment_options.get()
-        if selected_payment_method == "Efectivo":
+
+        # Obtener la tupla completa seleccionada
+        selected_tuple = next((tupla for tupla in payments if tupla[1] == self.payment_options.get()), None)
+
+        # Almacenar solo el ID seleccionado
+        self.selected_id = selected_tuple[0] if selected_tuple else None
+
+        # Almacenar nombre para Lógica
+        name_payment_method = selected_tuple[1] if selected_tuple else None
+
+        if name_payment_method == "Efectivo":
             self.scan_entry2.config(state="normal")
         else:
             # Borra el contenido del campo Entry
@@ -274,7 +288,7 @@ class PoS():
                         f"Vuelto: {'$':>23}{(payment_quantity - total_amount_law)}"
                     )
                     if messagebox.askyesno("Confirmar Pago", payment_confirmation):
-                        current_cart = self.get_current_cart(self.current_cart, total_amount, payment_method, payment_quantity, local, last_digit, total_amount_law, symbol) 
+                        current_cart = self.get_current_cart(self.current_cart, total_amount, payment_method, payment_quantity, local, self.selected_id, last_digit, total_amount_law, symbol) 
                         save_to_file(self, current_cart)
                         self.clear_cart()
                     else:
@@ -286,19 +300,21 @@ class PoS():
                 payment_quantity=total_amount
                 payment_confirmation = f"Total a pagar: ${total_amount}\nMétodo de pago: {payment_method}"
                 if messagebox.askyesno("Confirmar Pago", payment_confirmation):
-                    current_cart = self.get_current_cart(self.current_cart, total_amount, payment_method, payment_quantity, local, last_digit=None, total_amount_law=None, symbol=None) 
+                    current_cart = self.get_current_cart(self.current_cart, total_amount, payment_method, payment_quantity, local, self.selected_id, last_digit=None, total_amount_law=None, symbol=None)
                     save_to_file(self, current_cart)
                     self.clear_cart()
                 else:
                     self.message_label.config(text="Pago no confirmado", fg="red")
 
-    def get_current_cart(self, current_cart_cart, total_amount, payment_method, payment_quantity, local, last_digit, total_amount_law, symbol):
+    #   Funcion para mejorar código entendible
+    def get_current_cart(self, current_cart_cart, total_amount, payment_method, payment_quantity, local, selected_id ,last_digit, total_amount_law, symbol):
         current_cart = {
             "current_cart":current_cart_cart,
             "total_amount":total_amount,
             "payment_method":payment_method,
             "payment_quantity":payment_quantity,
             "local":local,
+            "payments":selected_id,
             "last_digit":last_digit,
             "total_amount_law":total_amount_law,
             "symbol":symbol
@@ -315,7 +331,8 @@ class PoS():
         self.scan_entry2.delete(0, tk.END)
         self.scan_entry2.config(state="disabled")
         self.scan_entry.focus_set()
-        self.message_label.config(text="Carrito vacío", fg="black")
+        self.message_label.config(text="", bg=color_cuerpo_principal)
+        self.message_label.config(text="Carrito vacío", fg="black", bg=color_cuerpo_principal)
   
     #   Ocultar para Menu
     def ocultar(self):

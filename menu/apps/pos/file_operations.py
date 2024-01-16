@@ -68,8 +68,8 @@ def write_detail(self, file, cart_info):
             file.write(f" Codigo: {product_code}\n")
             file.write(f" {formatted_quantity}X{formatted_price} {product_name}{' ' * cantidad}{'$'}{formatted_total_price:>11}\n")
         else:
-            cantidad = 45 - len(product_name)
-            file.write(f" {product_code:>13} {product_name:<{cantidad}}{'$'}{formatted_total_price:>11}\n")
+            cantidad = 28 - len(product_name)
+            file.write(f" {product_code:>13} {product_name}{' ' * cantidad}{'$'}{formatted_total_price:>11}\n")
     if ((payment_method == "Efectivo") and (last_digit in [0, None])) or (payment_method != "Efectivo"):
         file.write(" ----------------------------------------------------- \n")
         file.write(f"                                SUBTOTAL      $ {format_number(total_amount):>7}\n")

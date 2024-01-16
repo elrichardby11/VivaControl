@@ -13,6 +13,7 @@ def insert_data(self, cart_info):
     total_amount_law = cart_info.get("total_amount_law", None)
 
     local = local.replace(local, local[0])
+    payments = cart_info.get("payments", None)
     connection_str = f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE"
     fecha = datetime.now().strftime("%d/%m/%Y")
     periodo = int(datetime.now().strftime("%Y"))
@@ -21,6 +22,18 @@ def insert_data(self, cart_info):
 
         # Crear un cursor
         with con.cursor() as cursor:
+
+            # Consulta para insertar datos a pago movimiento
+            cursor.execute("SELECT MAX(ID_PAGO) FROM PAGO_MOVIMIENTO")
+            result = cursor.fetchone()
+            max_id = result[0] if result[0] is not None else 0
+            new_id_pay = max_id + 1
+            precio_total = total_amount if total_amount_law is None else total_amount_law
+
+            # Insercion de datos tabla Pago movimiento
+            query = "INSERT INTO PAGO_MOVIMIENTO (ID_PAGO, ID_METODO, MONTO) VALUES (:id_pay, :id_met, :monto)"
+            cursor.execute(query, id_pay=new_id_pay, id_met=payments, monto=precio_total)
+            con.commit()
 
             # Ejecutar la consulta SQL
             cursor.execute("SELECT MAX(ID_MOVIMIENTO) FROM MOVIMIENTO")
@@ -34,12 +47,10 @@ def insert_data(self, cart_info):
             tipo_mov = 2    # Tipo 2 Venta
             state = 1       # Estado Activo
             rut = 1         # Rut generico Cliente
-            precio_total = total_amount if total_amount_law is None else total_amount_law
-            
 
             # Inserta datos en Movimiento
-            query = "INSERT INTO MOVIMIENTO (ID_MOVIMIENTO, FECHA, ID_TIPO_MOVIMIENTO, PERIODO, CSTATE_MOVIMIENTO, RUT_AUXILIAR, PRECIO_TOTAL) VALUES (:id, TO_DATE(:fecha, 'dd/mm/yyyy'), :tipo, :periodo, :state, :rut, :precio)"
-            cursor.execute(query, id=new_id, fecha=fecha, tipo=tipo_mov, periodo=periodo, state=state, rut=rut, precio=precio_total)
+            query = "INSERT INTO MOVIMIENTO (ID_MOVIMIENTO, FECHA, ID_TIPO_MOVIMIENTO, PERIODO, CSTATE_MOVIMIENTO, RUT_AUXILIAR, PRECIO_TOTAL, ID_PAGO) VALUES (:id, TO_DATE(:fecha, 'dd/mm/yyyy'), :tipo, :periodo, :state, :rut, :precio, :id_pay)"
+            cursor.execute(query, id=new_id, fecha=fecha, tipo=tipo_mov, periodo=periodo, state=state, rut=rut, precio=precio_total, id_pay=new_id_pay)
             con.commit()
 
             # Ciclo para insertar en detalle de movimiento
@@ -115,8 +126,8 @@ def insert_data(self, cart_info):
                             if resultado is None:
 
                                 # Inserta datos en Movimiento ajuste precio coste
-                                query = "INSERT INTO MOVIMIENTO (ID_MOVIMIENTO, FECHA, ID_TIPO_MOVIMIENTO, PERIODO, CSTATE_MOVIMIENTO, RUT_AUXILIAR, PRECIO_TOTAL) VALUES (:id, TO_DATE(:fecha, 'dd/mm/yyyy'), :tipo, :periodo, :state, :rut, :precio)"
-                                cursor.execute(query, id=new_id+j, fecha=fecha, tipo=tipo_mov, periodo=periodo, state=state, rut=rut, precio=0)
+                                query = "INSERT INTO MOVIMIENTO (ID_MOVIMIENTO, FECHA, ID_TIPO_MOVIMIENTO, PERIODO, CSTATE_MOVIMIENTO, RUT_AUXILIAR, PRECIO_TOTAL, ID_PAGO) VALUES (:id, TO_DATE(:fecha, 'dd/mm/yyyy'), :tipo, :periodo, :state, :rut, :precio, :id_pay)"
+                                cursor.execute(query, id=new_id+j, fecha=fecha, tipo=tipo_mov, periodo=periodo, state=state, rut=rut, precio=0, id_pay=new_id_pay)
                                 con.commit()
 
                             if not detalle_inicial:
@@ -140,3 +151,4 @@ def insert_data(self, cart_info):
                         break
 
                     contador += (compras[i]["cantidad"])
+
