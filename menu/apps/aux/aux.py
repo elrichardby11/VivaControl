@@ -4,6 +4,7 @@ from tkinter import *
 from datetime import datetime
 import cx_Oracle
 from menu.config import color_cuerpo_principal
+from menu.apps.aux.type_aux import types
 from dotenv import load_dotenv
 import os
 
@@ -48,7 +49,7 @@ class Auxiliares():
         self.scan_label.place(relx=0.02, rely=0.175)
 
         # Selección de método de búsqueda
-        self.type_options = ttk.Combobox(self.root, values=["Rut", "Razon Social"], state="readonly")
+        self.type_options = ttk.Combobox(self.root, values=["Rut", "Razon_Social"], state="readonly")
         self.type_options.set("Rut")
         self.type_options.place(relx=0.02, rely=0.205, relwidth=0.175)
 
@@ -57,7 +58,9 @@ class Auxiliares():
         self.scan_label2.place(relx=0.275, rely=0.175)
 
         # Selección de método de búsqueda
-        self.type_options2 = ttk.Combobox(self.root, values=["Todos", "Proveedores", "Clientes", "Empleados", "Socios", "Distribuidores", "Otros"], state="readonly")
+        self.id_selected = 0
+        self.type_options2 = ttk.Combobox(self.root, values=[value for _, value in types], state="readonly")
+        self.type_options2.bind("<<ComboboxSelected>>", self.handle_type_aux_selection)
         self.type_options2.set("Todos")
         self.type_options2.place(relx=0.275, rely=0.205, relwidth=0.175)
 
@@ -74,7 +77,6 @@ class Auxiliares():
 
         self.radiobutton_no = tk.Radiobutton(self.scan_label3, text="No", value=1, variable=self.selected_option, bg=color_cuerpo_principal)
         self.radiobutton_no.place(relx=0.5, rely=0.05, relwidth=0.45, relheight=0.8)
-
 
         # Etiqueta de error
         self.error_label = tk.Label(self.root, text="", fg="red", bg=color_cuerpo_principal)
@@ -110,31 +112,39 @@ class Auxiliares():
         except tk.TclError as e:
             print("error tlc {e}")
 
+
     #   Buscar Auxiliar
     def search(self, event=None):
-        search_method = self.type_options.get()
 
-        if search_method == "Razon Social":
-            search_method = "RAZON_SOCIAL"
+        self.clear_list()
 
-        elif search_method == "Rut":
-            search_method = "RUT_AUXILIAR"
+        attributes = self.get_atributes(self.type_options.get().upper(), self.type_options2.get(), self.selected_option.get())
 
         consulta = (self.scan_entry.get().upper())
         consulta_con_comodines = f'%{consulta}%'
-        self.clear_list()
-        
+
         # Conectar a la base de datos Oracle
         con = cx_Oracle.connect(f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE")
 
         # Crear un cursor
         cursor = con.cursor()
 
-        # Ejecutar la consulta SQL
-        cursor.execute(f"SELECT RUT_AUXILIAR, DV, RAZON_SOCIAL, DIRECCION, TELEFONO FROM AUXILIAR WHERE {search_method} LIKE :con", con = consulta_con_comodines)
+        if attributes["type_aux"] == 0:
+
+            # Ejecutar consulta para todos los tipos de auxiliares
+            cursor.execute(f"SELECT RUT, DV, RAZON_SOCIAL, DIRECCION, TELEFONO FROM AUXILIAR WHERE {attributes['search_method']} LIKE :con AND ACTIVO = :activo", con = consulta_con_comodines, activo = attributes['active'])
+
+        else:
+
+            # Ejecutar la consulta SQL
+            cursor.execute(f"SELECT RUT, DV, RAZON_SOCIAL, DIRECCION, TELEFONO FROM AUXILIAR WHERE {attributes['search_method']} LIKE :con AND ID_TIPO_AUXILIAR = :tipo AND ACTIVO = :activo", con = consulta_con_comodines, tipo = attributes['type_aux'], activo = attributes['active'])
+
         # Obtener los resultados de la consulta
         results = cursor.fetchall()
 
+        # Cerrar la conexión
+        con.close()
+        
         if results != []:
             self.resultados = {}
             for row in results:
@@ -155,8 +165,30 @@ class Auxiliares():
         else:
             self.error_label.config(fg="red", text="Sin resultados")
 
-        # Cerrar la conexión
-        con.close()
+
+    def get_atributes(self, search_method, type_aux, active):
+
+        type_aux = self.handle_type_aux_selection()
+        active = 0 if active else 1
+
+        attributes = {
+            "search_method": search_method,
+            "type_aux": type_aux,
+            "active": active
+        }
+        
+        return attributes
+
+    def handle_type_aux_selection(self, event=None):
+
+        # Obtener la tupla completa seleccionada
+        selected_tuple = next((tupla for tupla in types if tupla[1] == self.type_options2.get()), 0)
+
+        # Almacenar solo el ID seleccionado
+        self.selected_id = selected_tuple[0] if selected_tuple else None
+
+        return self.selected_id
+
 
     #   Actualizar Lista
     def update_list(self):
