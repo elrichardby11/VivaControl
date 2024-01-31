@@ -112,7 +112,6 @@ class Auxiliares():
         except tk.TclError as e:
             print("error tlc {e}")
 
-
     #   Buscar Auxiliar
     def search(self, event=None):
 
@@ -123,30 +122,29 @@ class Auxiliares():
         consulta = (self.scan_entry.get().upper())
         consulta_con_comodines = f'%{consulta}%'
 
-        # Conectar a la base de datos Oracle
-        con = cx_Oracle.connect(f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE")
+        connection_str = f"{os.getenv('NAME_DATABASE')}/{os.getenv('PASSWORD_DATABASE')}@XE"
 
-        # Crear un cursor
-        cursor = con.cursor()
+        with cx_Oracle.connect(connection_str) as con:
 
-        if attributes["type_aux"] == 0:
+            with con.cursor() as cursor:
 
-            # Ejecutar consulta para todos los tipos de auxiliares
-            cursor.execute(f"SELECT RUT, DV, RAZON_SOCIAL, DIRECCION, TELEFONO FROM AUXILIAR WHERE {attributes['search_method']} LIKE :con AND ACTIVO = :activo", con = consulta_con_comodines, activo = attributes['active'])
+                if attributes["type_aux"] == 0:
 
-        else:
+                    # Ejecutar consulta para todos los tipos de auxiliares
+                    cursor.execute(f"SELECT RUT, DV, RAZON_SOCIAL, DIRECCION, TELEFONO FROM AUXILIAR WHERE {attributes['search_method']} LIKE :con AND ACTIVO = :activo", con = consulta_con_comodines, activo = attributes['active'])
 
-            # Ejecutar la consulta SQL
-            cursor.execute(f"SELECT RUT, DV, RAZON_SOCIAL, DIRECCION, TELEFONO FROM AUXILIAR WHERE {attributes['search_method']} LIKE :con AND ID_TIPO_AUXILIAR = :tipo AND ACTIVO = :activo", con = consulta_con_comodines, tipo = attributes['type_aux'], activo = attributes['active'])
+                else:
 
-        # Obtener los resultados de la consulta
-        results = cursor.fetchall()
+                    # Ejecutar la consulta SQL
+                    cursor.execute(f"SELECT RUT, DV, RAZON_SOCIAL, DIRECCION, TELEFONO FROM AUXILIAR WHERE {attributes['search_method']} LIKE :con AND ID_TIPO_AUXILIAR = :tipo AND ACTIVO = :activo", con = consulta_con_comodines, tipo = attributes['type_aux'], activo = attributes['active'])
 
-        # Cerrar la conexión
-        con.close()
-        
+                # Obtener los resultados de la consulta
+                results = cursor.fetchall()
+
         if results != []:
+
             self.resultados = {}
+
             for row in results:
 
                 rut, dv, name, address, phone_number = row
@@ -160,12 +158,13 @@ class Auxiliares():
                 self.update_list()
 
                 self.list_aux.insert(tk.END, row)
+
             self.error_label.config(fg="green", text="Mostrando resultados")
             
         else:
             self.error_label.config(fg="red", text="Sin resultados")
 
-
+    #   Obtener atributos para busqueda
     def get_atributes(self, search_method, type_aux, active):
 
         type_aux = self.handle_type_aux_selection()
@@ -179,6 +178,7 @@ class Auxiliares():
         
         return attributes
 
+    #   Manejar tipos auxiliares
     def handle_type_aux_selection(self, event=None):
 
         # Obtener la tupla completa seleccionada
@@ -188,7 +188,6 @@ class Auxiliares():
         self.selected_id = selected_tuple[0] if selected_tuple else None
 
         return self.selected_id
-
 
     #   Actualizar Lista
     def update_list(self):
@@ -221,11 +220,13 @@ class Auxiliares():
         self.list_aux.delete("1.0", tk.END)
         self.list_aux.configure(state=tk.DISABLED)
 
+    #   Ocultar para Menu
     def ocultar(self):
         for widget in self.root.winfo_children():
             widget.destroy()
         self.visible = False
     
+    #   Mostrar para Menu
     def mostrar(self):
         for widget in self.root.winfo_children():
             widget.place()
