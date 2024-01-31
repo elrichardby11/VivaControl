@@ -102,6 +102,9 @@ class Auxiliares():
 
         self.button_edit = tk.Button(self.root, text=" Editar ", command=self.edit)
         self.button_edit.place(relx=0.10, rely=0.9)
+
+        self.button_edit = tk.Button(self.root, text=" Añadir ", command=self.edit)
+        self.button_edit.place(relx=0.18, rely=0.9)
         
     #   Actualizar Tiempo
     def update_time(self):

@@ -16,6 +16,9 @@ class Login:
         customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
         customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
  
+        icon_path = os.path.abspath("../01.CODE/assets/logo.png")
+        root.iconphoto(True, tk.PhotoImage(file=icon_path))
+
         self.root.title('VivaControl - Login')
         util_ventana.centrar_ventana(self.root, 600, 440)
 
