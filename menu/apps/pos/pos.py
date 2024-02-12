@@ -7,7 +7,8 @@ from menu.apps.pos.locals import locals
 from menu.apps.pos.payments import payments
 from menu.config import color_cuerpo_principal
 from playsound import playsound
- 
+import time
+
 
 class PoS():
 
@@ -22,7 +23,7 @@ class PoS():
         self.previous_local = []
 
         self.create_widgets()
-
+        
     #   Crea los botones, textos, etc
     def create_widgets(self):
 
@@ -48,8 +49,8 @@ class PoS():
         self.cart_label = tk.Label(self.root, text="Carrito: ", bg=color_cuerpo_principal)
         self.cart_label.place(relx=0.4, rely=0.2, anchor="center")
 
-        self.tree = ttk.Treeview(self.root, height=0, columns=("col2", "col3", "col4", "col5"))
-        self.tree.place(relx=0.015, rely=0.225)
+        self.tree = ttk.Treeview(self.root, columns=("col2", "col3", "col4", "col5"))
+        self.tree.place(relx=0.015, rely=0.225, relwidth=0.775)
         self.tree.heading("#0", text="Código", anchor=tk.CENTER)
         self.tree.heading("col2", text="Nombre", anchor=tk.CENTER)
         self.tree.heading("col3", text="Precio", anchor=tk.CENTER)
@@ -62,7 +63,10 @@ class PoS():
         self.tree.column("col5", width=209)
         
         self.cart_listbox = tk.Listbox(self.root, borderwidth=2, relief="ridge", height=25, width=130, font=("Courier New", 10))
-        self.cart_listbox.place(relx=0.015, rely=0.25)
+        self.cart_listbox.place(relx=0.015, rely=0.25, relheight=0.625, relwidth=0.7651)
+
+        self.scrollbar = tk.Scrollbar(self.root)
+        self.scrollbar.place(relx=0.78,rely=0.225, relheight=0.6475)
         
         self.subtotal_label_cash = tk.Label(self.root, text="Total Solo Efectivo:    $    0", bg=color_cuerpo_principal)
         self.subtotal_label_cash.place(relx=0.4, rely=0.915, anchor="center")
@@ -186,7 +190,7 @@ class PoS():
             product_name = self.products[code]["name"]
             price = self.products[code]["price"]
             total = price * quantity
-            formatted_text = f"{code:^26}{product_name:^26}{price:^25}{quantity:^27}{total:>16}"    
+            formatted_text = f"{code:^26}{product_name:^26}{price:^25}{quantity:^27}{total:>16}"
             self.cart_listbox.insert(tk.END, formatted_text)
 
     #   Evento editar cantidad
@@ -333,6 +337,8 @@ class PoS():
         self.scan_entry.focus_set()
         self.message_label.config(text="", bg=color_cuerpo_principal)
         self.message_label.config(text="Carrito vacío", fg="black", bg=color_cuerpo_principal)
+        time.sleep(3)
+        self.message_label.config(text="", bg=color_cuerpo_principal)
   
     #   Ocultar para Menu
     def ocultar(self):

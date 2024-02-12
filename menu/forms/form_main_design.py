@@ -15,6 +15,7 @@ class FormMainDesign(tk.Tk):
         super().__init__()
         #self.logo = util_img.leer_imagen("/home/richard/Documentos/VivaControl/01.CODE/assets/VivaControl.png", (560, 136))
         self.perfil = util_img.leer_imagen("../01.CODE/assets/Profile.png", (100,100))
+        
         self.config_window()
         self.panels()
         self.top_bar_controls()
@@ -128,7 +129,8 @@ class FormMainDesign(tk.Tk):
             self.menu_lateral.pack(side=tk.LEFT, fill="y")
 
     def open_panel_info(self):
-        FormInfoDesign()
+        pass
+        #FormInfoDesign()
    
     def abrir_ventana_secundaria(self, clase_ventana):
 

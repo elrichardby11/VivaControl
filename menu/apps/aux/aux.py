@@ -88,13 +88,19 @@ class Auxiliares():
         self.tree.heading("col2", text="Razón Social", anchor=tk.CENTER)
         self.tree.heading("col3", text="Dirección", anchor=tk.CENTER)
         self.tree.heading("col4", text="Teléfono", anchor=tk.CENTER)
-        self.tree.column("#0", width=262)
-        self.tree.column("col2", width=262)
-        self.tree.column("col3", width=262)
-        self.tree.column("col4", width=262)
+        self.tree.column("#0", width=63)
+        self.tree.column("col2", width=375)
+        self.tree.column("col3", width=500)
+        self.tree.column("col4", width=63)
 
         # Lista de resultados
-        self.list_aux = st.ScrolledText(self.root, wrap=tk.WORD, borderwidth=2, width=140, height=20)
+        self.list_aux = tk.Listbox(self.root, borderwidth=2, relief="ridge", height=25, width=130, font=("Courier New", 10))
+        self.list_aux.place(relx=0.02, rely=0.35, relwidth=0.95, relheight=0.5)
+
+        self.scrollbar = tk.Scrollbar(self.root)
+        self.scrollbar.place(relx=0.97, rely=0.325, relheight=0.525)
+
+        #self.list_aux = st.ScrolledText(self.root, wrap=tk.WORD, borderwidth=2, width=140, height=20)
         self.list_aux.place(relx=0.02, rely=0.35, relwidth=0.95)
 
         self.button_view = tk.Button(self.root, text="   Ver   ", command=self.view)
@@ -158,10 +164,8 @@ class Auxiliares():
                 phone_number = phone_number if phone_number is not None else "-"
 
                 self.resultados[rut] = {"dv": dv, "name": name, "address" : address, "phone_number" : phone_number}
-                self.update_list()
-
-                self.list_aux.insert(tk.END, row)
-
+                
+            self.update_list()
             self.error_label.config(fg="green", text="Mostrando resultados")
             
         else:
@@ -194,14 +198,17 @@ class Auxiliares():
 
     #   Actualizar Lista
     def update_list(self):
+
         self.clear_list()
+        for rut, info in self.resultados.items():
 
-        self.list_aux.configure(state=tk.NORMAL)
+            formatted_text = f"{rut:>10} - {info['dv']:<5} {info['name']:<55} {info['address']:<71} {info['phone_number']:>10}"
 
-        for rut, info in self.resultados.items():         
-            self.list_aux.insert(tk.END,"{:>15}-{:<15} {:<40} {:<50} {:<10}\n".format(str(rut), str(info['dv']), info['name'], info['address'], str(info['phone_number'])))
-       
-        self.list_aux.configure(state=tk.DISABLED)
+            self.list_aux.insert(tk.END, formatted_text)
+        
+        # Configurar Scrollbar
+        self.list_aux.config(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.list_aux.yview)
 
     #   Ver Auxiliar
     def view(self):
@@ -219,9 +226,7 @@ class Auxiliares():
 
     #   Limpia Lista
     def clear_list(self):
-        self.list_aux.configure(state=tk.NORMAL)
-        self.list_aux.delete("1.0", tk.END)
-        self.list_aux.configure(state=tk.DISABLED)
+        self.list_aux.delete(0, tk.END)
 
     #   Ocultar para Menu
     def ocultar(self):

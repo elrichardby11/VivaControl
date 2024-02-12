@@ -7,7 +7,7 @@ import ast
 import menu.forms.form_main_design as form
 import menu.useful.useful_window as util_ventana
 
-class Login:
+class Login():
 
     def __init__(self, root):
         super().__init__()
@@ -78,7 +78,8 @@ class Login:
         credentials_correct = any(user == usuario and password == contrasena for user, password in users_and_passwords)
 
         if credentials_correct:
-            self.button_function(self)
+            #self.button_function()
+            self.root.after(10, self.button_function)
         else:
             self.text_var.set("Credenciales Incorrectas.")
             self.label2.configure(textvariable=self.text_var, fg_color=("#ffa372", "gray75"))
@@ -86,7 +87,7 @@ class Login:
     def button_function(self, event=None):
         self.root.destroy()  # destroy current window
         self.app = form.FormMainDesign()
-        self.app.mainloop()
+        #self.app.mainloop()
 
 def main():
     root = tk.Tk()
